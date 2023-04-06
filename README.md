@@ -1,1 +1,1 @@
-# Memory-Game using HTML, CSS & JavaScript
+# Concentration Game using HTML, CSS & JavaScript

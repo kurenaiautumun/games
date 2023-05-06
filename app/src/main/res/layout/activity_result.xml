@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/wallpaper"
+    tools:context=".ResultActivity">
+
+    <TextView
+        android:id="@+id/txtResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:text="Result"
+        android:textColor="#097CEF"
+        android:textSize="60sp"
+        android:textStyle="italic" />
+
+
+    <ImageView
+        android:id="@+id/imgResult"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_below="@id/txtResult"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/trophy" />
+
+    <TextView
+        android:id="@+id/txtHey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imgResult"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="25dp"
+        android:gravity="center"
+        android:text="Hey, "
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imgResult"
+        android:layout_marginTop="25dp"
+        android:layout_toRightOf="@id/txtHey"
+        android:gravity="center"
+        android:text="Username"
+        android:textColor="#D90F0F"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtScore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtUsername"
+        android:gravity="center"
+        android:text="Your score is 9 out 0f 10"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/submitCard"
+        android:layout_width="150dp"
+        android:padding="16dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtScore"
+        android:clickable="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="#6674B7E4"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="16dp">
+
+        <TextView
+            android:id="@+id/txtSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#6674B7E4"
+            android:text="Submit"
+            android:clickable="true"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginStart="20dp"
+            android:textSize="35dp" />
+
+
+    </androidx.cardview.widget.CardView>
+
+
+</RelativeLayout>

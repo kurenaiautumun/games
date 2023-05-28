@@ -32,10 +32,10 @@ class ResultActivity : AppCompatActivity() {
 
         val username = intent.getStringExtra(Constants.USER_NAME)
         txtUsername.text = username
-        val totalQuestions = intent.getIntExtra(Constants.TOTAL_QUESTIONS,0)
+
         val correctAnswers = intent.getIntExtra(Constants.CORRECT_ANSWERS, 0)
 
-        txtScore.text = "Your Score is $correctAnswers out of $totalQuestions"
+        txtScore.text = "Your Score is $correctAnswers"
 
         txtSubmit.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))

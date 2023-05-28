@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/txtUsername"
         android:gravity="center"
-        android:text="Your score is 9 out 0f 10"
+        android:text="Your score is 9"
         android:textColor="@color/black"
         android:textSize="25sp"
         android:textStyle="bold" />

@@ -1,5 +1,6 @@
 package com.chandravir.quiz
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
@@ -13,6 +14,7 @@ import androidx.core.content.ContextCompat
 
 class QuizQuestionsActivity : AppCompatActivity(), OnClickListener {
 
+    private lateinit var txtScore: TextView
     private lateinit var txtQuestion: TextView
     private lateinit var imgQuestion: ImageView
     private lateinit var progressBar: ProgressBar
@@ -31,12 +33,16 @@ class QuizQuestionsActivity : AppCompatActivity(), OnClickListener {
 
     private var mUserName: String? = null
 
+    private var count: Int = 0
+
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz_questions)
 
         mUserName = intent.getStringExtra(Constants.USER_NAME)
 
+        txtScore = findViewById(R.id.txtScore)
         txtQuestion = findViewById(R.id.txtQuestion)
         imgQuestion = findViewById(R.id.imgQuestion)
         progressBar = findViewById(R.id.progressBar)
@@ -72,11 +78,13 @@ class QuizQuestionsActivity : AppCompatActivity(), OnClickListener {
             btnSubmit.text = "SUBMIT"
         }
 
-        progressBar.progress = mCurrentPosition
-        txtProgressIndicator.text = "$mCurrentPosition" + "/" + progressBar.max
+        progressBar.progress = 3
+        txtProgressIndicator.text = "$count" + "/" + progressBar.max
+
+        //score indicator
+        txtScore.text = mCorrectAnswers.toString()
 
         txtQuestion.text = question!!.question
-        imgQuestion.setImageResource(question.image)
         txtOptionOne.text = question.optionOne
         txtOptionTwo.text = question.optionTwo
         txtOptionThree.text = question.optionThree
@@ -115,6 +123,8 @@ class QuizQuestionsActivity : AppCompatActivity(), OnClickListener {
                     when{
                         mCurrentPosition <= mQuestionsList!!.size ->{
                         setQuestion()
+
+                            //count += 1
                     }
                         else -> {
                             val intent = Intent(this, ResultActivity::class.java)
@@ -129,6 +139,27 @@ class QuizQuestionsActivity : AppCompatActivity(), OnClickListener {
                     val question = mQuestionsList?.get(mCurrentPosition -1)
                     if (question!!.correctAnswer != mSelectedOptionPosition){
                         answerView(mSelectedOptionPosition, R.drawable.wrong_option_background)
+                        Toast.makeText(this, "Wrong Answer", Toast.LENGTH_SHORT).show()
+
+                        count++
+
+                        if(count > 3){
+
+                            btnSubmit.setOnClickListener {
+                                val intent = Intent(this, ResultActivity::class.java)
+                                intent.putExtra(Constants.USER_NAME , mUserName)
+                                intent.putExtra(Constants.CORRECT_ANSWERS, mCorrectAnswers)
+                                intent.putExtra(Constants.TOTAL_QUESTIONS, mQuestionsList!!.size)
+                                startActivity(intent)
+
+                            }
+
+
+
+                        }
+
+
+
                     }
                     else{
                         mCorrectAnswers ++

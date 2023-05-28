@@ -640,7 +640,7 @@ object Constants {
         )
         questionsList.add(ques160)
 
-        val ques161 = Question(	13086,	"What is the synonym of DISTINCT ?",	"comforter",	"cite",	"valet de chambre",	"trenchant",	4
+        val ques161 = Question(	161,	"What is the synonym of DISTINCT ?",	"comforter",	"cite",	"valet de chambre",	"trenchant",	4
         )
         questionsList.add(ques161)
 

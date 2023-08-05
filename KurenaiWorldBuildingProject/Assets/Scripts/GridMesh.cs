@@ -11,13 +11,15 @@ using System;
 public class GridMesh : MonoBehaviour
 {
     public int GridSize;
-    public float CellSize;
+    private float CellSize;
     public bool fitToCamera;
 
     private Vector2 minCamPosForTranslation, maxCamPosForTranslation;
 
     private void Start()
     {
+        CellSize = GetComponent<GameManagerController>().gridCellSize;
+
         if (CellSize <= 0 || GridSize <= 0)
         {
             Debug.LogWarning("Size should not be negative or zero.");
@@ -41,6 +43,7 @@ public class GridMesh : MonoBehaviour
     private void Update()
     {
         // This is used for translating the grid to only fit within the view of camera especially if using fitToCamera
+        // This code assumes we move 1 cell at a time, it will break if the camera skips cells or do a direct translation to another position
 
         var camPos = Camera.main.transform.position;
 

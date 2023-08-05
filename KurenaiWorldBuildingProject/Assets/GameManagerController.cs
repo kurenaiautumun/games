@@ -26,6 +26,10 @@ public class GameManagerController : MonoBehaviour
     [SerializeField] private GameObject sideMode;
     private bool isSideModeEnabled;
 
+    [Header("Grid Section")]
+    public float gridCellSize = 1f;
+    public GridLineScript gridController;
+
     [Header("Debug Only Section")]
     [SerializeField] bool isDebugEnabled;
     [SerializeField] private GameObject debugCanvasObject;
@@ -39,8 +43,7 @@ public class GameManagerController : MonoBehaviour
     [SerializeField] private TransitionSettings transition;
     private TransitionManager transitionManager;
 
-    private GridMesh gridMesh;
-    private MeshRenderer gridMeshRenderer;
+    private Vector2 previousTouchLocation;
 
     // We will need to store the grid location and type of object rather than the GameObject itself
     private List<LocationAndTypeData> userPlacedPbjects;
@@ -58,15 +61,14 @@ public class GameManagerController : MonoBehaviour
         isSideModeEnabled = false;
 
         transitionManager = TransitionManager.Instance();
-        gridMesh = GetComponent<GridMesh>();
 
-        gridHighlight.GetComponent<LineRenderer>().SetPosition(1, Vector3.right * gridMesh.CellSize);
-        gridHighlight.GetComponent<LineRenderer>().SetPosition(2, new Vector3(1,1,0) * gridMesh.CellSize);
-        gridHighlight.GetComponent<LineRenderer>().SetPosition(3, Vector3.up * gridMesh.CellSize);
-
-        gridMeshRenderer = GetComponent<MeshRenderer>();
+        gridHighlight.GetComponent<LineRenderer>().SetPosition(1, Vector3.right * gridCellSize);
+        gridHighlight.GetComponent<LineRenderer>().SetPosition(2, new Vector3(1,1,0) * gridCellSize);
+        gridHighlight.GetComponent<LineRenderer>().SetPosition(3, Vector3.up * gridCellSize);
 
         userPlacedPbjects = new List<LocationAndTypeData>();
+
+        previousTouchLocation = Vector2.zero;
     }
 
     void Update()
@@ -75,20 +77,20 @@ public class GameManagerController : MonoBehaviour
         {
             var mouseScreenPos = Input.mousePosition;
             var mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
-            var gridPos = new Vector3(Mathf.Floor(mouseWorldPos.x / gridMesh.CellSize), Mathf.Floor(mouseWorldPos.y / gridMesh.CellSize), 0);
+            var gridPos = new Vector3(Mathf.Floor(mouseWorldPos.x / gridCellSize), Mathf.Floor(mouseWorldPos.y / gridCellSize), 0);
 
             // Debug display coords
             mouseCoordinateScreenText.SetText("MouseScreenPos: " + mouseScreenPos.ToString());
             mouseCoordinateWorldText.SetText("MouseWorldPos: " + mouseWorldPos.ToString());
             gridCoordinateText.SetText("GridPos: " + gridPos.ToString());
 
-            gridHighlight.transform.position = gridPos * gridMesh.CellSize;
+            gridHighlight.transform.position = gridPos * gridCellSize;
 
             // We will also need to prevent data to be added to an already filled location
 
             if(Input.GetMouseButtonDown(0))
             {
-                var gridObject = Instantiate(filler, (gridPos + new Vector3(0.5f,0.5f,0)) * gridMesh.CellSize, Quaternion.identity);
+                var gridObject = Instantiate(filler, (gridPos + new Vector3(0.5f,0.5f,0)) * gridCellSize, Quaternion.identity);
                 gridObject.transform.SetParent(topDownMode.transform);
                 var data = new LocationAndTypeData(gridPos, gridObject);
                 userPlacedPbjects.Add(data);
@@ -97,6 +99,21 @@ public class GameManagerController : MonoBehaviour
 
         Vector3 move = Vector3.up * Input.GetAxis("Vertical") + Vector3.right * Input.GetAxis("Horizontal");
         Camera.main.transform.position += move * Time.deltaTime;
+
+        if(Input.touchCount > 0)
+        {
+            var touch = Input.GetTouch(0);
+            if(touch.phase == TouchPhase.Began)
+            {
+                previousTouchLocation = touch.position;
+            }
+            else
+            {
+                var displacement = touch.position - previousTouchLocation;
+                previousTouchLocation = touch.position;
+                Camera.main.transform.position -= new Vector3(displacement.x, displacement.y, 0) * Time.deltaTime;
+            }     
+        }
     }
 
     ////////////////////////////////////////////
@@ -117,7 +134,7 @@ public class GameManagerController : MonoBehaviour
             sideMode.SetActive(false);
             topDownMode.SetActive(true);
 
-            gridMeshRenderer.enabled = true;
+            gridController.EnableGridLines();
         }
         else
         {
@@ -125,7 +142,7 @@ public class GameManagerController : MonoBehaviour
             sideMode.SetActive(true);
             topDownMode.SetActive(false);
 
-            gridMeshRenderer.enabled = false;
+            gridController.DisableGridLines();
         }
         transitionManager.onTransitionCutPointReached -= OnTransitionEndSwitchViewMode;
     }

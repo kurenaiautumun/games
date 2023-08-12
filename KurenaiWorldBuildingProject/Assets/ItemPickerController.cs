@@ -1,0 +1,37 @@
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ItemPickerController : MonoBehaviour
+{
+    private TMP_Dropdown dropdown;
+
+    [SerializeField] private List<GameObject> itemsList;
+
+    void Start()
+    {
+        dropdown = GetComponent<TMP_Dropdown>();
+        dropdown.ClearOptions();
+
+        foreach(GameObject item in itemsList)
+        {
+            TMP_Dropdown.OptionData optionData = new TMP_Dropdown.OptionData();
+            GridObject gridObject = item.GetComponent<GridObject>();
+
+            optionData.text = GridObject.GetName(gridObject.type);
+            optionData.image = item.GetComponent<SpriteRenderer>().sprite;
+
+            dropdown.options.Add(optionData);
+        }
+
+        dropdown.value = 0;
+    }
+
+    public GameObject GetItem()
+    {
+        if (dropdown.value == -1) return null;
+        return itemsList[dropdown.value];
+    }
+}

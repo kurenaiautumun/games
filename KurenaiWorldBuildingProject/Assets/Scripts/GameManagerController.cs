@@ -8,16 +8,21 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static UnityEditor.Progress;
 
+public enum GridInteractionMode {Select, Place, Clear };
+
 public class GameManagerController : MonoBehaviour
 {
     [Header("Game View Section")]
     [SerializeField] private GameObject topDownMode;
     [SerializeField] private GameObject sideMode;
+    [SerializeField] private float sideViewScaleMult = 1f;
     private bool isSideModeEnabled;
+    private Vector3 topDownViewCameraPos, sideViewCameraPos;
 
     [Header("Grid Section")]
     public float gridCellSize = 1f;
     public Vector2Int playingFieldSize = Vector2Int.one;
+    public GridInteractionMode gridInteractionMode = GridInteractionMode.Select;
     [SerializeField] private GameObject gridHighlight;
     [SerializeField] private GameObject boundaryHighlight;
     [SerializeField] private Vector2Int playingFieldOrigin = Vector2Int.zero;
@@ -45,10 +50,7 @@ public class GameManagerController : MonoBehaviour
     private bool hasInputTouchDragged;
     private bool hasInputTouchOverUI;
 
-    // We will need to store the grid location and type of object rather than the GameObject itself
-    private List<GameObject> userPlacedPbjects;
-
-    private bool[,] isCellOccupied;
+    private GameObject[,] isCellOccupied;
 
     void Start()
     {
@@ -71,16 +73,17 @@ public class GameManagerController : MonoBehaviour
         transitionManager = TransitionManager.Instance();
 
         previousTouchLocation = new Vector3(Screen.width / 2, Screen.height / 2, 0);
-        SetHighlight(previousTouchLocation);
+        SetHighlight(previousTouchLocation, false);
         SetBoundary(previousTouchLocation);
-        
-        userPlacedPbjects = new List<GameObject>();
 
         previousTouchLocation = Vector2.zero;
         hasInputTouchDragged = false;
         hasInputTouchOverUI = false;
 
-        isCellOccupied = new bool[playingFieldSize.x, playingFieldSize.y];
+        isCellOccupied = new GameObject[playingFieldSize.x, playingFieldSize.y];
+
+        topDownViewCameraPos = Camera.main.transform.position;
+        sideViewCameraPos = Camera.main.transform.position;
     }
 
     void Update()
@@ -117,7 +120,7 @@ public class GameManagerController : MonoBehaviour
                 else
                 {
                     previousTouchLocation = touch.position;
-                    SetHighlight(touch.position);
+                    SetHighlight(touch.position, gridInteractionMode == GridInteractionMode.Place);
                 }
             }
 
@@ -148,12 +151,17 @@ public class GameManagerController : MonoBehaviour
 
                         if (!isSideModeEnabled)
                         {
-                            if (!IsValidGridCells(gridPos))
+                            if(!IsValidGridCells(gridPos) && gridInteractionMode == GridInteractionMode.Clear)
+                            {
+                                ClearObjectFromWorld(gridPos);
+                            }
+                            if (!IsValidGridCells(gridPos, gridInteractionMode == GridInteractionMode.Place))
                                 SetHighlightColor(Color.red);
                             else
                             {
-                                SetHighlightColor(new Color(255, 128, 0));
-                                PlaceObjectInWorld(gridPos);
+                                SetHighlightColor(new Color(1, 0.5f, 0));
+                                if(gridInteractionMode == GridInteractionMode.Place)
+                                    PlaceObjectInWorld(gridPos);
                             }             
                         }
                     }
@@ -165,16 +173,18 @@ public class GameManagerController : MonoBehaviour
 
     }
 
+    // Converts a world position into grid position
     private Vector3 GetGridPosition(Vector3 worldPos)
     {
         return new Vector3(Mathf.Floor(worldPos.x / gridCellSize), Mathf.Floor(worldPos.y / gridCellSize), 0);
     }
 
-    private void SetHighlight(Vector3 screenPos)
+    // Sets the position and size of the higlighter (default: uses the item selected in the dropdown menu for size)
+    private void SetHighlight(Vector3 screenPos, bool useDropdownItem = true)
     {
         var item = itemPickerDropdownContainer.GetComponent<ItemPickerController>().GetItem();
         var gridSize = Vector2.one;
-        if (item != null) 
+        if (item != null && useDropdownItem)
             gridSize = item.gameObject.GetComponent<GridObject>().size;
 
         gridHighlight.transform.position = GetGridPosition(Camera.main.ScreenToWorldPoint(screenPos)) * gridCellSize;
@@ -183,6 +193,7 @@ public class GameManagerController : MonoBehaviour
         gridHighlight.GetComponent<LineRenderer>().SetPosition(3, Vector3.up * gridCellSize * gridSize.y);
     }
 
+    // Sets the position and size of the game boundary
     private void SetBoundary(Vector3 screenPos)
     {
         boundaryHighlight.transform.position = (GetGridPosition(Camera.main.ScreenToWorldPoint(screenPos)) + new Vector3(playingFieldOrigin.x, playingFieldOrigin.y, 0)) * gridCellSize;
@@ -191,12 +202,14 @@ public class GameManagerController : MonoBehaviour
         boundaryHighlight.GetComponent<LineRenderer>().SetPosition(3, Vector3.up * gridCellSize * playingFieldSize.y);
     }
 
+    // Set the colour of the highlighter
     private void SetHighlightColor(Color color)
     {
         gridHighlight.GetComponent<LineRenderer>().startColor = color;
         gridHighlight.GetComponent<LineRenderer>().endColor = color;
     }
 
+    // Place selected item into both top view and side view (separate GameObjects but linked via GridObject)
     private void PlaceObjectInWorld(Vector3 gridPos)
     {
         var item = itemPickerDropdownContainer.GetComponent<ItemPickerController>().GetItem();
@@ -214,18 +227,45 @@ public class GameManagerController : MonoBehaviour
         {
             for(int y = 0; y < size.y; y++)
             {
-                isCellOccupied[x + pos.x, y + pos.y] = true;
+                isCellOccupied[x + pos.x, y + pos.y] = gridObject;
             }
         }
 
-        userPlacedPbjects.Add(gridObject);
-
         // Side View
-        var sideObject = Instantiate(item, new Vector3(gridPos.x + (item.GetComponent<GridObject>().size.x - 1) * 0.5f, item.transform.localScale.y * 0.5f, 0), Quaternion.identity);
+        var sideObject = Instantiate(item, new Vector3(gridPos.x + (item.GetComponent<GridObject>().size.x - 1) * 0.5f , item.transform.localScale.y * 0.5f * sideViewScaleMult, 0), Quaternion.identity);
         sideObject.transform.SetParent(sideMode.transform);
         sideObject.GetComponent<SpriteRenderer>().sortingOrder = (int)-gridPos.y;
+        sideObject.transform.localScale *= sideViewScaleMult;
+
+        gridObject.GetComponent<GridObject>().altViewObject = sideObject;
     }
 
+    // Clears the selected grid object from both top view and side view
+    private void ClearObjectFromWorld(Vector3 gridPos)
+    {
+        Vector2Int pos = Vector2Int.RoundToInt(gridPos) - playingFieldOrigin;
+        if (pos.x >= playingFieldSize.x || pos.x < 0 ||
+            pos.y >= playingFieldSize.y || pos.y < 0)
+            return;
+
+        var item = isCellOccupied[pos.x, pos.y];
+        if (item == null)
+            return;
+
+        var size = item.GetComponent<GridObject>().size;
+        for (int x = 0; x < size.x; x++)
+        {
+            for (int y = 0; y < size.y; y++)
+            {
+                isCellOccupied[x + pos.x, y + pos.y] = null;
+            }
+        }
+
+        Destroy(item.GetComponent<GridObject>().altViewObject);
+        Destroy(item);
+    }
+
+    // Moves the camera (limits it to within the bounds of the playing field)
     private void MoveCamera(Vector2 displacement)
     {
         Vector3 camPos = Camera.main.transform.position;
@@ -257,7 +297,8 @@ public class GameManagerController : MonoBehaviour
         Debug.Log(s);
     }
 
-    private bool IsValidGridCells(Vector3 gridPos)
+    // Checks if cell(s) already contain an item (default: uses the dropdown menu item to determine all the cells that the item will occupy)
+    private bool IsValidGridCells(Vector3 gridPos, bool useDropdownItem = true)
     {
         Vector2Int pos = Vector2Int.RoundToInt(gridPos) - playingFieldOrigin;
 
@@ -266,7 +307,10 @@ public class GameManagerController : MonoBehaviour
             return false;
 
         var selection = itemPickerDropdownContainer.GetComponent<ItemPickerController>().GetItem();
-        var size = selection.GetComponent<GridObject>().size;
+
+        var size = Vector2.one;
+        if(selection != null && useDropdownItem)
+            size = selection.GetComponent<GridObject>().size;
 
         if (pos.x + size.x > playingFieldSize.x || pos.y + size.y > playingFieldSize.y)
             return false;
@@ -275,11 +319,11 @@ public class GameManagerController : MonoBehaviour
         {
             for(int y = 0; y < size.y; y++)
             {
-                if (isCellOccupied[x + pos.x, y + pos.y])
+                if (isCellOccupied[x + pos.x, y + pos.y] != null)
                     return false;
             }
         }
-       
+
         return true;
     }
 
@@ -300,6 +344,34 @@ public class GameManagerController : MonoBehaviour
         SetHighlight(previousTouchLocation);
     }
 
+    public void SwitchInteractionMode(GameObject buttonGameObject)
+    {
+        TMP_Text text = buttonGameObject.GetComponentInChildren<TMP_Text>();
+
+        switch(gridInteractionMode)
+        {
+            case GridInteractionMode.Select: gridInteractionMode = GridInteractionMode.Place;
+                text.SetText("Place");
+                SetHighlight(previousTouchLocation);
+                break;
+
+            case GridInteractionMode.Place: gridInteractionMode = GridInteractionMode.Clear;
+                text.SetText("Clear");
+                SetHighlight(previousTouchLocation, false);
+                break;
+
+            case GridInteractionMode.Clear: gridInteractionMode = GridInteractionMode.Select;
+                text.SetText("Select");
+                SetHighlight(previousTouchLocation, false);
+                break;
+
+            default: gridInteractionMode = GridInteractionMode.Select;
+                text.SetText("Select");
+                SetHighlight(previousTouchLocation, false);
+                break;
+        }
+    }
+
     private void OnTransitionEndSwitchViewMode()
     {
         if (isSideModeEnabled)
@@ -307,6 +379,8 @@ public class GameManagerController : MonoBehaviour
             isSideModeEnabled = false;
             sideMode.SetActive(false);
             topDownMode.SetActive(true);
+            sideViewCameraPos = Camera.main.transform.position;
+            Camera.main.transform.position = topDownViewCameraPos;
 
             cameraController.EnableGridLines();
         }
@@ -315,6 +389,8 @@ public class GameManagerController : MonoBehaviour
             isSideModeEnabled = true;
             sideMode.SetActive(true);
             topDownMode.SetActive(false);
+            topDownViewCameraPos = Camera.main.transform.position;
+            Camera.main.transform.position = sideViewCameraPos;
 
             cameraController.DisableGridLines();
         }

@@ -10,6 +10,7 @@ public class GridObject : MonoBehaviour
     public objectType type = objectType.None;
     public Vector2 gridPosition = Vector2.zero;
     public Vector2 size = Vector2.one;
+    public GameObject altViewObject = null;
 
     private static Dictionary<int, string> objectTypeName = new Dictionary<int, string>()
     {

@@ -103,8 +103,6 @@ public class CameraController : MonoBehaviour
             GL.Vertex3(i - centerX + offsetX, actualSizeY - centerY + offsetY, 0);
         }
 
-        GL.End();
-
-        
+        GL.End(); 
     }
 }

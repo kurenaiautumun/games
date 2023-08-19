@@ -5,6 +5,8 @@ Current update on project:
 ![MainMenu](https://github.com/kurenaiautumun/games/blob/world-building/screenshots/mainmenu.png)
 - Grid system for top down view
 ![Grid](https://github.com/kurenaiautumun/games/blob/world-building/screenshots/grids.png)
+- Layered Side View (WIP)
+![LayeredSideView](https://github.com/kurenaiautumun/games/blob/world-building/screenshots/layeredsideview.png)
 
 ## Notes
 

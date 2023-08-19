@@ -64,12 +64,13 @@
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\GameManagerController.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\TransitionSettings.cs" />
+    <Compile Include="Assets\Scripts\PlayingField.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\CutoutMaskUI.cs" />
     <Compile Include="Assets\Scripts\MainMenuController.cs" />
+    <Compile Include="Assets\Scripts\ItemPickerController.cs" />
     <Compile Include="Assets\External\EasyTransitions\Demo\DemoLoadScene.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\TransitionManager.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
-    <Compile Include="Assets\ItemPickerController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

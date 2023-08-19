@@ -29,5 +29,10 @@ public class GridObject : MonoBehaviour
         Vector2 worldPos = (gridPosition + new Vector2(0.5f, 0.5f)) * cellSize;
         return worldPos;
     }
+
+    public Vector2 GetSpriteLowerLeftCorner()
+    {
+        return gameObject.GetComponent<SpriteRenderer>().sprite.bounds.min * gameObject.transform.localScale.x;
+    }
 }
 

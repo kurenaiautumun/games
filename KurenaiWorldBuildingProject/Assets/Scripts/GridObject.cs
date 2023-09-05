@@ -7,21 +7,20 @@ public enum objectType { None, House, Tree };
 
 public class GridObject : MonoBehaviour
 {
-    public objectType type = objectType.None;
+    //public objectType type = objectType.None;
     public Vector2 gridPosition = Vector2.zero;
     public Vector2 size = Vector2.one;
+    public float scale = 1f;
     public GameObject altViewObject = null;
+    public int id = -1;
 
-    private static Dictionary<int, string> objectTypeName = new Dictionary<int, string>()
+    public string GetName()
     {
-        {0, "" },
-        {1, "House" },
-        {2, "Tree" }    
-    };
-
-    public static string GetName(objectType type)
-    {
-        return objectTypeName.TryGetValue((int)type, out var name) ? name : string.Empty;
+        int clone = gameObject.name.IndexOf("(");
+        if(clone > 0)
+            return gameObject.name.Substring(0,clone);
+        else
+            return gameObject.name;
     }
 
     public Vector2 GetWorldPosition(int cellSize)
@@ -32,7 +31,7 @@ public class GridObject : MonoBehaviour
 
     public Vector2 GetSpriteLowerLeftCorner()
     {
-        return gameObject.GetComponent<SpriteRenderer>().sprite.bounds.min * gameObject.transform.localScale.x;
+        return gameObject.GetComponent<SpriteRenderer>().sprite.bounds.min * scale;
     }
 }
 

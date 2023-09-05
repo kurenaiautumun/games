@@ -20,7 +20,7 @@ public class ItemPickerController : MonoBehaviour
             TMP_Dropdown.OptionData optionData = new TMP_Dropdown.OptionData();
             GridObject gridObject = item.GetComponent<GridObject>();
 
-            optionData.text = GridObject.GetName(gridObject.type);
+            optionData.text = gridObject.GetName();
             optionData.image = item.GetComponent<SpriteRenderer>().sprite;
 
             dropdown.options.Add(optionData);
@@ -29,9 +29,15 @@ public class ItemPickerController : MonoBehaviour
         dropdown.value = 0;
     }
 
-    public GameObject GetItem()
+    public GameObject GetItem(int id = -1)
     {
+        if(id >= 0 && id < itemsList.Count) return itemsList[id];
         if (dropdown.value == -1) return null;
         return itemsList[dropdown.value];
+    }
+
+    public int GetCurrentIndex()
+    {
+        return dropdown.value;
     }
 }

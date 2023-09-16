@@ -2,6 +2,7 @@ using EasyTransition;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Linq;
@@ -13,7 +14,9 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using static System.TimeZoneInfo;
 using static UnityEditor.Experimental.GraphView.GraphView;
+using static UnityEditor.PlayerSettings;
 using static UnityEditor.Progress;
+using Color = UnityEngine.Color;
 
 public enum GridInteractionMode {Select, Place, Clear };
 
@@ -29,17 +32,21 @@ public class LoadableObjects
     public LoadableObjects(int t, Vector2 pos) { id = t; gridPosX = (int)pos.x; gridPosY = (int)pos.y; }
 };
 
+
+
 [Serializable]
 public class GridData
 {
-    public int gridNo;
+    public int gridCountX, gridCountY, gridSizeX, gridSizeY;
     public List<LoadableObjects> objects = new List<LoadableObjects>();
 }
 
-public class SaveData
+[Serializable]
+public class MapData
 {
+    public string name;
     public int gridCount;
-    public List<GridData> data = new List<GridData>();
+    public List<GridData> grids = new List<GridData>();
 }
 
 public class GameManagerController : MonoBehaviour
@@ -52,26 +59,29 @@ public class GameManagerController : MonoBehaviour
     [SerializeField] private float sideViewMinScale = 0.2f;
     [SerializeField] private int playingFieldCount = 1;
     [SerializeField] private GameObject sideViewMarker;
-    private bool isSideModeEnabled;
+    public bool isSideModeEnabled;
     private Vector3 topDownViewCameraPos, sideViewCameraPos;
     private float topDownViewZoom, sideViewZoom;
     private int sideViewActiveLayer;
-    private int sideViewActiveGrid;
+    private int sideViewActiveGrid, topViewActiveGrid;
     private GameObject topDownMode;
     private GameObject sideMode;
-    private PlayingField playingField;
+    private PlayingField[] playingFields;
     private Grid sideGrid;
     private GameObject[] sideViewMarkers;
     private GameObject sideViewMarkerHierarchy;
     private GameObject[] topDownSubGrids;
-    private GameObject[,] sideViewCrossGridObjects;
+    private GameObject[,,] sideViewCrossGridObjects;
     private GameObject boundsHierarchy;
+    private GameObject[] topDownObjectsHierarchy;
+    private GameObject[] crossGridObjectsHierarchy;
 
     [Header("Grid Section")]
     public float gridCellSize = 1f;
     public Vector2Int playingFieldSubGridSize = Vector2Int.one;
     [SerializeField] private Vector2Int playingFieldOrigin = Vector2Int.zero;
     [SerializeField] private Vector2Int playingFieldGridCount = Vector2Int.one;
+    [SerializeField] private int gridsPerMapCount = 1;
     public GridInteractionMode gridInteractionMode = GridInteractionMode.Select;
     [SerializeField] private GameObject gridHighlight;
     [SerializeField] private GameObject boundaryHighlight;
@@ -102,6 +112,7 @@ public class GameManagerController : MonoBehaviour
     private bool hasInputTouchDragged;
     private bool hasInputTouchOverUI;
     private bool isGamePaused;
+    public string baseSavePath;
 
     void Start()
     {
@@ -129,14 +140,17 @@ public class GameManagerController : MonoBehaviour
         topDownViewZoom = 6;
         sideViewZoom = 3;
 
-        sideViewActiveLayer = -1;
-        sideViewActiveGrid = 0;
+        baseSavePath = Path.Combine(Application.persistentDataPath, "savedata");
+        if(!Directory.Exists(baseSavePath))
+            Directory.CreateDirectory(baseSavePath);
 
-        sideViewMarkers = new GameObject[playingField.size.x];
+        sideViewMarkers = new GameObject[playingFields[topViewActiveGrid].size.x];
         isGamePaused = false;
         gameUIPanelContainer.SetActive(true);
         pausePanelContainer.SetActive(false);
         topDownMode.SetActive(true);
+        topDownObjectsHierarchy[0].SetActive(true);
+        crossGridObjectsHierarchy[0].SetActive(true);
     }
 
     void Update()
@@ -203,9 +217,7 @@ public class GameManagerController : MonoBehaviour
                     {
                         var touchScreenPos = touch.position;
                         var touchWorldPos = Camera.main.ScreenToWorldPoint(touchScreenPos);
-                        var gridPos = GetGridPosition(touchWorldPos);
-
-                       
+                        var gridPos = GetGridPosition(touchWorldPos);         
 
                         // Top down mode
                         if (!isSideModeEnabled)
@@ -228,8 +240,8 @@ public class GameManagerController : MonoBehaviour
                         else
                         {
                             gridPos = sideGrid.WorldToCell(touchWorldPos);
-                            if ((gridPos.x - playingFieldOrigin.x) < (playingField.size.x * playingFieldCount))
-                                gridPos.x = ((gridPos.x - playingFieldOrigin.x) % playingField.size.x) + playingFieldOrigin.x;
+                            if ((gridPos.x - playingFieldOrigin.x) < (playingFields[topViewActiveGrid].size.x * playingFieldCount))
+                                gridPos.x = ((gridPos.x - playingFieldOrigin.x) % playingFields[topViewActiveGrid].size.x) + playingFieldOrigin.x;
 
                             gridPos.y = sideViewActiveLayer + playingFieldOrigin.y;
 
@@ -243,8 +255,14 @@ public class GameManagerController : MonoBehaviour
                             {
                                 SetHighlightColor(new Color(1, 0.5f, 0));
                                 if (gridInteractionMode == GridInteractionMode.Place)
+                                {
                                     PlaceObjectInWorld(gridPos);
+                                }
+                                    
                             }
+
+                            if (gridInteractionMode == GridInteractionMode.Place)
+                                Debug.Log(gridPos);
                         }
                     }
                 }
@@ -254,7 +272,7 @@ public class GameManagerController : MonoBehaviour
         }
 
     }
-
+        
     // Converts a world position into grid position
     private Vector3 GetGridPosition(Vector3 worldPos)
     {
@@ -280,9 +298,9 @@ public class GameManagerController : MonoBehaviour
     {
         // Main boundary
         boundaryHighlight.transform.position = ( /*GetGridPosition(Camera.main.ScreenToWorldPoint(screenPos)) +*/ new Vector3(playingFieldOrigin.x, playingFieldOrigin.y, 0)) * gridCellSize;
-        boundaryHighlight.GetComponent<LineRenderer>().SetPosition(1, Vector3.right * gridCellSize * playingField.size.x);
-        boundaryHighlight.GetComponent<LineRenderer>().SetPosition(2, new Vector3(playingField.size.x, playingField.size.y, 0) * gridCellSize);
-        boundaryHighlight.GetComponent<LineRenderer>().SetPosition(3, Vector3.up * gridCellSize * playingField.size.y);
+        boundaryHighlight.GetComponent<LineRenderer>().SetPosition(1, Vector3.right * gridCellSize * playingFields[topViewActiveGrid].size.x);
+        boundaryHighlight.GetComponent<LineRenderer>().SetPosition(2, new Vector3(playingFields[topViewActiveGrid].size.x, playingFields[topViewActiveGrid].size.y, 0) * gridCellSize);
+        boundaryHighlight.GetComponent<LineRenderer>().SetPosition(3, Vector3.up * gridCellSize * playingFields[topViewActiveGrid].size.y);
 
         // Sub grid boundaries
         boundsHierarchy = new GameObject("Bounds");
@@ -297,8 +315,8 @@ public class GameManagerController : MonoBehaviour
                 subgridBound.transform.SetParent(boundsHierarchy.transform);
 
                 LineRenderer line = subgridBound.GetComponent<LineRenderer>();
-                line.startColor = Color.white;
-                line.endColor = Color.cyan;
+                line.startColor = UnityEngine.Color.white;
+                line.endColor = UnityEngine.Color.cyan;
                 line.SetPosition(1, Vector3.right * gridCellSize * playingFieldSubGridSize.x);
                 line.SetPosition(2, new Vector3(playingFieldSubGridSize.x, playingFieldSubGridSize.y, 0) * gridCellSize);
                 line.SetPosition(3, Vector3.up * gridCellSize * playingFieldSubGridSize.y);
@@ -326,11 +344,18 @@ public class GameManagerController : MonoBehaviour
             size = component.size;
         Vector2Int pos = Vector2Int.RoundToInt(gridPos) - playingFieldOrigin;
 
+        /*if (isSideModeEnabled)
+        {
+            var subgridPos = playingField.GetSubGrid(sideViewActiveGrid) + playingFieldSubGridSize;
+            if (pos.x > subgridPos.x || pos.y > subgridPos.y)
+                return;
+        }*/
+
         // Top Down View
-        int gridIndex = playingField.GetSubGridIndex(pos);
+        int gridIndex = playingFields[topViewActiveGrid].GetSubGridIndex(pos);
         Vector3 sizeOffset = (Vector3)(size - Vector2.one) * 0.5f;
         var gridObject = Instantiate(item, (gridPos + new Vector3(0.5f, 0.5f, 0) + sizeOffset ) * gridCellSize, Quaternion.identity);
-        gridObject.transform.SetParent(topDownMode.transform);
+        gridObject.transform.SetParent(topDownObjectsHierarchy[topViewActiveGrid].transform);
         gridObject.GetComponent<GridObject>().gridPosition = gridPos;
         gridObject.GetComponent<GridObject>().id = itemID;
         gridObject.transform.localScale = size;
@@ -339,20 +364,22 @@ public class GameManagerController : MonoBehaviour
 
         for(int x = 0; x < size.x; x++)
         {
-            if(gridIndex != playingField.GetSubGridIndex(pos + new Vector2Int(x,0)))
+            if(gridIndex != playingFields[topViewActiveGrid].GetSubGridIndex(pos + new Vector2Int(x,0)))
             {
                 isCrossGrid = true;
             }
                 
             for(int y = 0; y < size.y; y++)
             {
-                playingField[y + pos.y, x + pos.x] = gridObject;
+                playingFields[topViewActiveGrid][y + pos.y, x + pos.x] = gridObject;
             } 
         }
 
         // Side View
-        var sideViewScale = GetSideViewWorldScale(playingField.size.y - pos.y);
-        var sideGridPos = sideGrid.WorldToCell(new Vector3(gridPos.x, gridPos.y/2, gridPos.y)) + new Vector3((item.GetComponent<GridObject>().size.x - 1) * 0.5f + sideViewActiveGrid * playingField.size.x, - item.GetComponent<GridObject>().GetSpriteLowerLeftCorner().y * sideViewScale, 0);
+        var sideViewScale = GetSideViewWorldScale(playingFields[topViewActiveGrid].size.y - pos.y);
+        var sideGridPos = GetSideViewWorldPosition(gridPos) + new Vector3((item.GetComponent<GridObject>().size.x - 1) * 0.5f, - item.GetComponent<GridObject>().GetSpriteLowerLeftCorner().y * sideViewScale, 0);
+
+        Debug.Log("SideGridPos: "+ GetSideViewWorldPosition(gridPos));
 
         var sideObject = Instantiate(item, sideGridPos, Quaternion.identity);
         sideObject.GetComponent<SpriteRenderer>().sortingOrder = (int)-gridPos.y;
@@ -362,11 +389,19 @@ public class GameManagerController : MonoBehaviour
 
         if (isCrossGrid)
         {
-            sideViewCrossGridObjects[gridIndex % playingFieldGridCount.x, pos.y] = sideObject;
-            sideObject.transform.SetParent(sideMode.transform);
+            for(int y = 0; y < size.y; y++)
+            {
+                sideViewCrossGridObjects[topViewActiveGrid, gridIndex % playingFieldGridCount.x, pos.y + y] = sideObject;
+            }
+            
+            sideObject.transform.SetParent(crossGridObjectsHierarchy[topViewActiveGrid].transform);
+            sideObject.SetActive(isSideModeEnabled);
         }
         else
+        {
             sideObject.transform.SetParent(topDownSubGrids[gridIndex].transform);
+        }
+            
 
         if (isSideModeEnabled)
         {
@@ -383,11 +418,11 @@ public class GameManagerController : MonoBehaviour
     private void ClearObjectFromWorld(Vector3 gridPos)
     {
         Vector2Int pos = Vector2Int.RoundToInt(gridPos) - playingFieldOrigin;
-        if (pos.x >= playingField.size.x || pos.x < 0 ||
-            pos.y >= playingField.size.y || pos.y < 0)
+        if (pos.x >= playingFields[topViewActiveGrid].size.x || pos.x < 0 ||
+            pos.y >= playingFields[topViewActiveGrid].size.y || pos.y < 0)
             return;
 
-        var item = playingField[pos.y, pos.x];
+        var item = playingFields[topViewActiveGrid][pos.y, pos.x];
         if (item == null)
             return;
 
@@ -396,7 +431,7 @@ public class GameManagerController : MonoBehaviour
         {
             for (int y = 0; y < size.y; y++)
             {
-                playingField[y + pos.y, x + pos.x] = null;
+                playingFields[topViewActiveGrid][y + pos.y, x + pos.x] = null;
             }
         }
 
@@ -436,13 +471,13 @@ public class GameManagerController : MonoBehaviour
     // Returns the world position in side view for a given gridPos
     private Vector3 GetSideViewWorldPosition(Vector3 gridPos)
     {
-        return sideGrid.WorldToCell(new Vector3(gridPos.x, gridPos.y / 2, gridPos.y)) + new Vector3(-2f, -1.5f, 0);
+        return sideGrid.WorldToCell(new Vector3(gridPos.x, gridPos.y / 2, gridPos.y));
     }
 
     // Returns the scale of object for side view depending on their layer (y position)
     private float GetSideViewWorldScale(float yPos)
     {
-        return Mathf.Lerp(sideViewMinScale, 1f, yPos / playingField.size.y);
+        return Mathf.Lerp(sideViewMinScale, 1f, yPos / playingFields[topViewActiveGrid].size.y);
     }
     
     // Makes the layer that we want to edit to be active in side view (invalid values will reset)
@@ -452,14 +487,14 @@ public class GameManagerController : MonoBehaviour
             ClearPreviousActiveLayer(sideViewActiveLayer);
 
         sideViewActiveLayer = layer;
-        if (layer < 0 || layer >= playingField.size.y || !isSideModeEnabled)
+        if (layer < 0 || layer >= playingFields[topViewActiveGrid].size.y || !isSideModeEnabled)
         {
-            layer = -1;
+            sideViewActiveLayer = -1;
             SetCurrentSubGridView(0);
             ResetSideViewShadings();
             return;
         }
-        SetSideViewShadings(sideViewActiveLayer);
+
         SetCurrentSubGridView(sideViewActiveGrid);
         activeLayerText.SetText("Layer: "+layer.ToString());
     }
@@ -467,18 +502,18 @@ public class GameManagerController : MonoBehaviour
     // Clears the previous active layer
     private void ClearPreviousActiveLayer(int focusedLayer)
     {
-        for (int x = 0; x < playingField.size.x; x++)
+        for (int x = 0; x < playingFields[topViewActiveGrid].size.x; x++)
         {
             // Remove markers if they are present
             sideViewMarkers[x] = null;
 
-            var currentItem = playingField[focusedLayer, x];
+            var currentItem = playingFields[topViewActiveGrid][focusedLayer, x];
             if (currentItem == null)
                 continue;
 
             // if currentItem doesn't have GridObject (for some reason) we clear it else we edit the side view's object's sorting layer to be default
             if (currentItem.GetComponent<GridObject>() == null)
-                playingField[focusedLayer, x] = null;
+                playingFields[topViewActiveGrid][focusedLayer, x] = null;
             else
             {
                 var sideObject = currentItem.GetComponent<GridObject>().altViewObject;
@@ -493,11 +528,15 @@ public class GameManagerController : MonoBehaviour
     // Edits the sprites in side view to differentiate the focused layer from others
     private void SetSideViewShadings(int focusedLayer)
     {
-        for (int y = playingField.size.y - 1; y >= 0; y--)
+        darkOverlay.SetActive(true);
+
+        int yLimit = playingFields[topViewActiveGrid].GetSubGrid(sideViewActiveGrid).y * playingFieldSubGridSize.y;
+
+        for (int y = playingFields[topViewActiveGrid].size.y - 1; y >= yLimit; y--)
         {
-            for (int x = 0; x < playingField.size.x; x++)
+            for (int x = 0; x < playingFields[topViewActiveGrid].size.x; x++)
             {
-                var currentItem = playingField[y, x];
+                var currentItem = playingFields[topViewActiveGrid][y, x];    
 
                 // We check if the currentItem's origin is on another layer instead of the current one or if it is null
                 if (currentItem == null || (currentItem.GetComponent<GridObject>().gridPosition.y - playingFieldOrigin.y) != y)
@@ -505,7 +544,7 @@ public class GameManagerController : MonoBehaviour
 
                 // Apply color and transparency according to how far from the focused layer
                 var altItem = currentItem.GetComponent<GridObject>().altViewObject;
-                float shading = (playingField.size.y - Mathf.Abs(focusedLayer - y)) / (float)playingField.size.y;
+                float shading = (playingFields[topViewActiveGrid].size.y - Mathf.Abs(focusedLayer - y)) / (float)playingFields[topViewActiveGrid].size.y;
                 altItem.GetComponent<SpriteRenderer>().color = new Color(shading, shading, shading, shading);
                 altItem.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
 
@@ -513,15 +552,25 @@ public class GameManagerController : MonoBehaviour
             }
         }
 
-        for(int x = 0; x < playingField.size.x; x++)
+        if (focusedLayer < yLimit)
+            return;
+
+        Destroy(sideViewMarkerHierarchy);
+        sideViewMarkerHierarchy = new GameObject("Markers");
+        sideViewMarkerHierarchy.transform.SetParent(sideMode.transform);
+
+        for (int x = 0; x < playingFieldSubGridSize.x; x++)
         {
-            var currentItem = playingField[focusedLayer, x];
+            var xOffset = playingFields[topViewActiveGrid].GetSubGrid(sideViewActiveGrid).x * playingFieldSubGridSize.x + x;
+            var currentItem = playingFields[topViewActiveGrid][focusedLayer, xOffset];
+
+            Debug.Log(xOffset);
 
             if(currentItem == null)
             {
                 //Create a marker/highlight over this position to indicate that there is available space
 
-                var pos = GetSideViewWorldPosition(new Vector3(x, focusedLayer, 0)) + new Vector3(-0.5f + sideViewActiveGrid * playingField.size.x, -0.5f, 0);
+                var pos = GetSideViewWorldPosition(new Vector3(xOffset + playingFieldOrigin.x, focusedLayer + playingFieldOrigin.y, 0)) + new Vector3(0f , -0.5f, 0);
                 sideViewMarkers[x] = Instantiate(sideViewMarker, pos, Quaternion.identity);
                 sideViewMarkers[x].transform.SetParent(sideViewMarkerHierarchy.transform);
             }
@@ -537,19 +586,17 @@ public class GameManagerController : MonoBehaviour
 
                 x += (int)altItem.GetComponent<GridObject>().size.x - 1;
             }
-        }
-
-        darkOverlay.SetActive(true);
+        }    
     }
 
     // Sets the scaling of side view objects based on their grid's positioning
     private void SetSideViewScalings(int startingYPos)
     {
-        for (int y = playingField.size.y - 1; y >= startingYPos; y--)
+        for (int y = playingFields[topViewActiveGrid].size.y - 1; y >= startingYPos; y--)
         {
-            for (int x = 0; x < playingField.size.x; x++)
+            for (int x = 0; x < playingFields[topViewActiveGrid].size.x; x++)
             {
-                var currentItem = playingField[y, x];
+                var currentItem = playingFields[topViewActiveGrid][y, x];
 
                 // We check if the currentItem's origin is on another layer instead of the current one or if it is null
                 if (currentItem == null || (currentItem.GetComponent<GridObject>().gridPosition.y - playingFieldOrigin.y) != y)
@@ -558,8 +605,8 @@ public class GameManagerController : MonoBehaviour
                 // Apply new scaling
                 var component = currentItem.GetComponent<GridObject>();
                 var altItem = component.altViewObject;
-                float yPos = playingField.size.y - y + startingYPos;
-                float sideViewScale = Mathf.Lerp(sideViewMinScale, 1f, yPos / playingField.size.y);
+                float yPos = playingFields[topViewActiveGrid].size.y - y + startingYPos;
+                float sideViewScale = Mathf.Lerp(sideViewMinScale, 1f, yPos / playingFields[topViewActiveGrid].size.y);
                 altItem.transform.localScale = Vector3.one * sideViewScale * component.scale;
 
                 x += (int)altItem.GetComponent<GridObject>().size.x - 1;
@@ -570,11 +617,11 @@ public class GameManagerController : MonoBehaviour
     // Reset the side view shadings (make them solid)
     private void ResetSideViewShadings()
     {
-        for (int y = playingField.size.y - 1; y >= 0; y--)
+        for (int y = playingFields[topViewActiveGrid].size.y - 1; y >= 0; y--)
         {
-            for (int x = 0; x < playingField.size.x; x++)
+            for (int x = 0; x < playingFields[topViewActiveGrid].size.x; x++)
             {
-                var currentItem = playingField[y, x];
+                var currentItem = playingFields[topViewActiveGrid][y, x];
 
                 // We check if the currentItem's origin is on another layer instead of the current one or if it is null
                 if (currentItem == null || (currentItem.GetComponent<GridObject>().gridPosition.y - playingFieldOrigin.y) != y)
@@ -589,7 +636,7 @@ public class GameManagerController : MonoBehaviour
             }
         }
 
-        for (int x = 0; x < playingField.size.x; x++)
+        for (int x = 0; x < playingFields[topViewActiveGrid].size.x; x++)
             sideViewMarkers[x] = null;
 
         while (sideViewMarkerHierarchy.transform.childCount > 0)
@@ -610,13 +657,13 @@ public class GameManagerController : MonoBehaviour
         }
 
         int idx = grid % playingFieldGridCount.x;
-        int idy = grid * playingFieldSubGridSize.y / playingFieldGridCount.x;
+        int idy = (grid / playingFieldGridCount.x) * playingFieldSubGridSize.y;
 
         if (idx == 0)
         {
-            for (int i = idy; i < playingField.size.y; i++)
+            for (int i = idy; i < playingFields[topViewActiveGrid].size.y; i++)
             {
-                var obj = sideViewCrossGridObjects[idx, i];
+                var obj = sideViewCrossGridObjects[topViewActiveGrid, idx, i];
                 if (obj != null)
                 {
                     obj.SetActive(true);
@@ -627,9 +674,9 @@ public class GameManagerController : MonoBehaviour
         else if (idx == playingFieldGridCount.x - 1)
         {
             --idx;
-            for (int i = idy; i < playingField.size.y; i++)
+            for (int i = idy; i < playingFields[topViewActiveGrid].size.y; i++)
             {
-                var obj = sideViewCrossGridObjects[idx, i];
+                var obj = sideViewCrossGridObjects[topViewActiveGrid, idx, i];
                 if (obj != null)
                 {
                     obj.SetActive(true);
@@ -639,12 +686,12 @@ public class GameManagerController : MonoBehaviour
 
         else
         {
-            for (int i = idy; i < playingField.size.y; i++)
+            for (int i = idy; i < playingFields[topViewActiveGrid].size.y; i++)
             {
-                var obj = sideViewCrossGridObjects[idx - 1, i];
+                var obj = sideViewCrossGridObjects[topViewActiveGrid, idx - 1, i];
                 if (obj != null)
                     obj.SetActive(true);
-                obj = sideViewCrossGridObjects[idx, i];
+                obj = sideViewCrossGridObjects[topViewActiveGrid, idx, i];
                 if (obj != null)
                     obj.SetActive(true);
             }
@@ -652,16 +699,20 @@ public class GameManagerController : MonoBehaviour
 
         if(isSideModeEnabled)
         {            
-            var gridPos = playingField.GetSubGrid(grid);
+            var gridPos = playingFields[topViewActiveGrid].GetSubGrid(grid);
             var worldPos = new Vector3(gridPos.x * gridCellSize, gridPos.y * gridCellSize, Camera.main.transform.position.z);
             worldPos = sideGrid.CellToWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
             worldPos.z = Camera.main.transform.position.z;
             Camera.main.transform.position = worldPos;
 
             SetSideViewScalings(gridPos.y * playingFieldSubGridSize.y);
+            activeGridText.SetText("View: " + grid.ToString());
         }
-
-        activeGridText.SetText("Grid: "+grid.ToString());
+        else
+        {
+            activeGridText.SetText("Grid: " + topViewActiveGrid.ToString());
+        }
+        
     }
 
     // Deactivates the objects of the previous sub grid
@@ -675,9 +726,9 @@ public class GameManagerController : MonoBehaviour
         string s = "";
         for (int i = 0; i < playingFieldGridCount.x - 1; i++)
         {
-            for (int y = 0; y < playingField.size.y; y++)
+            for (int y = 0; y < playingFields[topViewActiveGrid].size.y; y++)
             {
-                var o = sideViewCrossGridObjects[i, y];
+                var o = sideViewCrossGridObjects[topViewActiveGrid, i, y];
                 s += (o == null ? "null" : o.name) + ", \t";
             }
             s += "\n";
@@ -688,9 +739,9 @@ public class GameManagerController : MonoBehaviour
 
         if (idx == 0)
         {
-            for (int i = idy; i < playingField.size.y; i++)
+            for (int i = idy; i < playingFields[topViewActiveGrid].size.y; i++)
             {
-                var obj = sideViewCrossGridObjects[idx, i];
+                var obj = sideViewCrossGridObjects[topViewActiveGrid, idx, i];
                 if (obj != null)
                 {
                     obj.SetActive(false);
@@ -701,9 +752,9 @@ public class GameManagerController : MonoBehaviour
         else if (idx == playingFieldGridCount.x - 1)
         {
             --idx;
-            for (int i = idy; i < playingField.size.y; i++)
+            for (int i = idy; i < playingFields[topViewActiveGrid].size.y; i++)
             {
-                var obj = sideViewCrossGridObjects[idx, i];
+                var obj = sideViewCrossGridObjects[topViewActiveGrid, idx, i];
                 if (obj != null)
                 {
                     obj.SetActive(false);
@@ -713,12 +764,12 @@ public class GameManagerController : MonoBehaviour
 
         else
         {
-            for (int i = idy; i < playingField.size.y; i++)
+            for (int i = idy; i < playingFields[topViewActiveGrid].size.y; i++)
             {
-                var obj = sideViewCrossGridObjects[idx - 1, i];
+                var obj = sideViewCrossGridObjects[topViewActiveGrid, idx - 1, i];
                 if (obj != null)
                     obj.SetActive(false);
-                obj = sideViewCrossGridObjects[idx, i];
+                obj = sideViewCrossGridObjects[topViewActiveGrid, idx, i];
                 if (obj != null)
                     obj.SetActive(false);
             }
@@ -727,11 +778,93 @@ public class GameManagerController : MonoBehaviour
         if (!isSideModeEnabled || sideViewActiveLayer < 0)
             return;
 
-        for (int x = 0; x < playingField.size.x; x++)
+        for (int x = 0; x < playingFields[topViewActiveGrid].size.x; x++)
             sideViewMarkers[x] = null;
 
         while (sideViewMarkerHierarchy.transform.childCount > 0)
             DestroyImmediate(sideViewMarkerHierarchy.transform.GetChild(0).gameObject);
+    }
+
+    private void SetCurrentGrid(int grid)
+    {
+        topDownObjectsHierarchy[grid].SetActive(true);
+        crossGridObjectsHierarchy[grid].SetActive(true);
+
+        for(int y = 0; y < playingFields[grid].size.y; y++)
+        {
+            for(int x = 0; x < playingFields[grid].size.x; x++)
+            {
+                var item = playingFields[grid][y, x];
+                if (item == null)
+                    continue;
+
+                var component = item.GetComponent<GridObject>();
+                Vector2Int gridPos = Vector2Int.RoundToInt(component.gridPosition);
+                Vector2Int pos = gridPos - playingFieldOrigin;
+
+                if (pos.x != x || pos.y != y)
+                    continue;
+
+                Vector2 size = component.size;
+
+                int gridIndex = playingFields[topViewActiveGrid].GetSubGridIndex(pos);
+                bool isCrossGrid = false;
+
+                for (int sizex = 0; sizex < size.x; sizex++)
+                {
+                    if (gridIndex != playingFields[topViewActiveGrid].GetSubGridIndex(pos + new Vector2Int(sizex, 0)))
+                        isCrossGrid = true;
+                }
+
+                // Side View
+                var sideViewScale = GetSideViewWorldScale(playingFields[topViewActiveGrid].size.y - pos.y);
+                var sideGridPos = GetSideViewWorldPosition(new Vector3(gridPos.x,gridPos.y)) + new Vector3((size.x - 1) * 0.5f, -component.GetSpriteLowerLeftCorner().y * sideViewScale, 0);
+
+                var sideObject = Instantiate(item, sideGridPos, Quaternion.identity);
+                sideObject.GetComponent<SpriteRenderer>().sortingOrder = (int)-gridPos.y;
+                sideObject.transform.localScale = Vector3.one * sideViewScale * component.scale;
+
+                playingFields[grid][y, x].GetComponent<GridObject>().altViewObject = sideObject;
+
+                if (isCrossGrid)
+                {
+                    sideViewCrossGridObjects[topViewActiveGrid, gridIndex % playingFieldGridCount.x, pos.y] = sideObject;
+                    sideObject.transform.SetParent(crossGridObjectsHierarchy[topViewActiveGrid].transform);
+                    sideObject.SetActive(false);
+                }
+                else
+                {
+                    sideObject.transform.SetParent(topDownSubGrids[gridIndex].transform);
+                }
+
+                x += (int)size.x - 1;
+            }
+        }
+
+        activeGridText.SetText("Grid: " + grid.ToString());
+    }
+
+    private void ClearPreviousGrid(int grid)
+    {
+        topDownObjectsHierarchy[grid].SetActive(false);
+
+        for (int i = 0; i < playingFieldCount; i++)
+        {
+            Destroy(topDownSubGrids[i]);
+
+            topDownSubGrids[i] = new GameObject("SubGrid" + i);
+            topDownSubGrids[i].transform.SetParent(sideMode.transform);
+            topDownSubGrids[i].SetActive(false);
+        }
+
+        for (int i = 0; i < gridsPerMapCount; i++)
+        {
+            Destroy(crossGridObjectsHierarchy[i]);
+
+            crossGridObjectsHierarchy[i] = new GameObject("CrossGrid" + i);
+            crossGridObjectsHierarchy[i].transform.SetParent(sideMode.transform);
+            crossGridObjectsHierarchy[i].SetActive(false);
+        }
     }
 
     // Checks if cell(s) already contain an item (default: uses the dropdown menu item to determine all the cells that the item will occupy)
@@ -739,8 +872,8 @@ public class GameManagerController : MonoBehaviour
     {
         Vector2Int pos = Vector2Int.RoundToInt(gridPos) - playingFieldOrigin;
 
-        if (pos.x >= playingField.size.x || pos.x < 0 ||
-            pos.y >= playingField.size.y || pos.y < 0)
+        if (pos.x >= playingFields[topViewActiveGrid].size.x || pos.x < 0 ||
+            pos.y >= playingFields[topViewActiveGrid].size.y || pos.y < 0)
             return false;
 
         var selection = itemPickerDropdownContainer.GetComponent<ItemPickerController>().GetItem();
@@ -749,7 +882,7 @@ public class GameManagerController : MonoBehaviour
         if(selection != null && useDropdownItem)
             size = selection.GetComponent<GridObject>().size;
 
-        if (pos.x + size.x > playingField.size.x || pos.y + size.y > playingField.size.y)
+        if (pos.x + size.x > playingFields[topViewActiveGrid].size.x || pos.y + size.y > playingFields[topViewActiveGrid].size.y)
             return false;
         
 
@@ -757,7 +890,7 @@ public class GameManagerController : MonoBehaviour
         {
             for(int y = 0; y < size.y; y++)
             {
-                if (playingField[y + pos.y, x + pos.x] != null)
+                if (playingFields[topViewActiveGrid][y + pos.y, x + pos.x] != null)
                     return false;
             }
         }
@@ -769,11 +902,14 @@ public class GameManagerController : MonoBehaviour
     ///// General Map Operations
     ////////////////////////////////////////////
 
-    private void CreateEmptyMap()
+    public void CreateEmptyMap()
     {
-        playingField = new PlayingField(playingFieldSubGridSize, playingFieldGridCount);
+        playingFields = new PlayingField[gridsPerMapCount];
+        for(int i = 0; i < gridsPerMapCount; i++)
+            playingFields[i] = new PlayingField(playingFieldSubGridSize, playingFieldGridCount);
+        
         playingFieldCount = playingFieldGridCount.x * playingFieldGridCount.y;
-        playingFieldOrigin = -playingField.size / 2;
+        playingFieldOrigin = -playingFields[0].size / 2;
 
         topDownMode = Instantiate(topDownModePrefab, Vector3.zero, Quaternion.identity);
         topDownMode.SetActive(false);
@@ -796,27 +932,49 @@ public class GameManagerController : MonoBehaviour
             topDownSubGrids[i].SetActive(false);
         }
 
-        sideViewCrossGridObjects = new GameObject[playingFieldGridCount.x - 1, playingField.size.y];
+        topDownObjectsHierarchy = new GameObject[gridsPerMapCount];
+        crossGridObjectsHierarchy = new GameObject[gridsPerMapCount];
+        for (int i = 0; i < gridsPerMapCount; i++)
+        {
+            topDownObjectsHierarchy[i] = new GameObject("Grid"+i);
+            topDownObjectsHierarchy[i].transform.SetParent(topDownMode.transform);
+            topDownObjectsHierarchy[i].SetActive(false);
+
+            crossGridObjectsHierarchy[i] = new GameObject("CrossGrid"+i);
+            crossGridObjectsHierarchy[i].transform.SetParent(sideMode.transform);
+            crossGridObjectsHierarchy[i].SetActive(false);
+        }
+
+        sideViewCrossGridObjects = new GameObject[gridsPerMapCount, playingFieldGridCount.x - 1, playingFields[0].size.y];
 
         SetCurrentSubGridView(0);
+
+        sideViewActiveLayer = -1;
+        sideViewActiveGrid = 0;
+        topViewActiveGrid = 0;
     }
 
-    private void SaveCurrentMap(string savePath)
+    public void SaveCurrentMap(string fileName)
     {
         string jsonString = "";
-        SaveData saveData = new SaveData();
-        saveData.gridCount = playingFieldCount;
+        
+        MapData mapData = new MapData();
+        mapData.name = fileName;
+        mapData.gridCount = gridsPerMapCount;
 
-        for (int field = 0; field < playingFieldCount; field++)
+        for(int i=0;i<gridsPerMapCount;i++)
         {
             GridData gridData = new GridData();
-            gridData.gridNo = field;
+            gridData.gridCountX = playingFieldGridCount.x;
+            gridData.gridCountY = playingFieldGridCount.y;
+            gridData.gridSizeX = playingFieldSubGridSize.x;
+            gridData.gridSizeY = playingFieldSubGridSize.y;
 
-            for (int x = 0; x < playingField.size.x; x++)
+            for (int x = 0; x < playingFields[i].size.x; x++)
             {
-                for (int y = 0; y < playingField.size.y; y++)
+                for (int y = 0; y < playingFields[i].size.y; y++)
                 {
-                    var item = playingField[y, x];
+                    var item = playingFields[i][y, x];
                     if (item != null)
                     {
                         var component = item.GetComponent<GridObject>();
@@ -827,21 +985,21 @@ public class GameManagerController : MonoBehaviour
                             continue;
 
                         LoadableObjects saveObject = new LoadableObjects(component.id, pos);
-                        gridData.objects.Add(saveObject);      
+                        gridData.objects.Add(saveObject);
                     }
                 }
             }
-            saveData.data.Add(gridData);
-        }
+            mapData.grids.Add(gridData);
+        }   
         
-        jsonString += JsonUtility.ToJson(saveData);
-        savePath = "E:/test.json";
+        jsonString += JsonUtility.ToJson(mapData);
+        string savePath = Path.Combine(baseSavePath, fileName + ".json");
         StreamWriter writer = new StreamWriter(savePath, false);
         writer.WriteLine(jsonString);
         writer.Close();
     }
 
-    private void ClearCurrentMap()
+    public void ClearCurrentMap()
     {
         Destroy(topDownMode);
         Destroy(sideMode);
@@ -849,42 +1007,57 @@ public class GameManagerController : MonoBehaviour
         playingFieldCount = 0;
     }
 
-    private void LoadNewMap(string mapFile)
+    public void LoadNewMap(string mapFile)
     {
-        string jsonString = File.ReadAllText(mapFile);
-        var saveData = JsonUtility.FromJson<SaveData>(jsonString);
-        playingFieldCount = saveData.gridCount;
+        string mapPath = Path.Combine(baseSavePath, mapFile);
+        string jsonString = File.ReadAllText(mapPath);
+        var mapData = JsonUtility.FromJson<MapData>(jsonString);
+
+        gridsPerMapCount = mapData.gridCount;
+        playingFieldGridCount = new Vector2Int(mapData.grids[0].gridCountX, mapData.grids[0].gridCountY);
+        playingFieldSubGridSize = new Vector2Int(mapData.grids[0].gridSizeX, mapData.grids[0].gridSizeY);
 
         // Create new map
         CreateEmptyMap();
 
         // Populate map
-        foreach (var grid in saveData.data)
+        for (topViewActiveGrid = 0; topViewActiveGrid < mapData.gridCount; topViewActiveGrid++)
         {
-            //topViewActiveGrid = grid.gridNo;
+            var grid = mapData.grids[topViewActiveGrid];
             foreach(var item in grid.objects)
             {
-                Vector3 gridPos = new Vector3(item.gridPosX, item.gridPosY);
+                Vector3 gridPos = new Vector3(item.gridPosX + playingFieldOrigin.x, item.gridPosY + playingFieldOrigin.y);
                 GameObject prefab = itemPickerDropdownContainer.GetComponent<ItemPickerController>().GetItem(item.id);
                 if (prefab != null)
                     PlaceObjectInWorld(gridPos, prefab);
                 else
                     Debug.LogError("Item Type is invalid!");
             }
-        }
+            
+        }    
 
         sideViewActiveGrid = 0;
+        topViewActiveGrid = 0;
         topDownMode.SetActive(true);
+
+        topDownObjectsHierarchy[0].SetActive(true);
     }
 
     ////////////////////////////////////////////
     ///// UI Operations
     ////////////////////////////////////////////
 
-    public void SwitchViewMode()
+    public void SwitchViewMode(bool instant = false)
     {
-        transitionManager.onTransitionCutPointReached += OnTransitionEndSwitchViewMode;
-        transitionManager.Transition(transition, 0f);
+        if (instant)
+        {
+            OnTransitionEndSwitchViewMode();
+        }
+        else
+        {
+            transitionManager.onTransitionCutPointReached += OnTransitionEndSwitchViewMode;
+            transitionManager.Transition(transition, 0f);
+        }
     }
 
     public void PickItem()
@@ -900,7 +1073,7 @@ public class GameManagerController : MonoBehaviour
             return;
 
         sideViewActiveLayer++;
-        if(sideViewActiveLayer >= playingField.size.y)
+        if(sideViewActiveLayer >= playingFields[topViewActiveGrid].size.y)
             sideViewActiveLayer = 0;
         SetCurrentSideViewLayer(sideViewActiveLayer);
     }
@@ -912,44 +1085,46 @@ public class GameManagerController : MonoBehaviour
 
         sideViewActiveLayer--;
         if (sideViewActiveLayer < 0)
-            sideViewActiveLayer = playingField.size.y - 1;
+            sideViewActiveLayer = playingFields[topViewActiveGrid].size.y - 1;
         SetCurrentSideViewLayer(sideViewActiveLayer);
     }
 
     public void SwitchNextGrid()
     {
-        ClearPreviousSubGridView(sideViewActiveGrid);
-        if(++sideViewActiveGrid >= playingFieldCount)
-            sideViewActiveGrid = 0;
-        SetCurrentSubGridView(sideViewActiveGrid);
+        if(isSideModeEnabled)
+        {
+            ClearPreviousSubGridView(sideViewActiveGrid);
+            if (++sideViewActiveGrid >= playingFieldCount)
+                sideViewActiveGrid = 0;
+            SetCurrentSubGridView(sideViewActiveGrid);
+        }
+
+        else
+        {
+            ClearPreviousGrid(topViewActiveGrid);
+            if (++topViewActiveGrid >= gridsPerMapCount)
+                topViewActiveGrid = 0;
+            SetCurrentGrid(topViewActiveGrid);
+        }       
     }
 
     public void SwitchPreviousGrid()
     {
-        ClearPreviousSubGridView(sideViewActiveGrid);
-        if (--sideViewActiveGrid < 0)
-            sideViewActiveGrid = playingFieldCount - 1;
-        SetCurrentSubGridView(sideViewActiveGrid);
-    }
-
-    public void SaveMap()
-    {
-        SaveCurrentMap("");
-        ResumeGame();
-    }
-
-    public void LoadMap()
-    {
-        ClearCurrentMap();
-        LoadNewMap("");
-        ResumeGame();
-    }
-
-    public void NewMap()
-    {
-        ClearCurrentMap();
-        CreateEmptyMap();
-        ResumeGame();
+        if(isSideModeEnabled)
+        {
+            ClearPreviousSubGridView(sideViewActiveGrid);
+            if (--sideViewActiveGrid < 0)
+                sideViewActiveGrid = playingFieldCount - 1;
+            SetCurrentSubGridView(sideViewActiveGrid);
+        }
+        
+        else
+        {
+            ClearPreviousGrid(topViewActiveGrid);
+            if (--topViewActiveGrid < 0)
+                topViewActiveGrid = gridsPerMapCount - 1;
+            SetCurrentGrid(topViewActiveGrid);
+        }
     }
 
     public void PauseGame()
@@ -1023,6 +1198,8 @@ public class GameManagerController : MonoBehaviour
             cameraController.EnableGridLines();
 
             SetCurrentSideViewLayer(-1);
+
+            activeLayerText.gameObject.SetActive(false);
         }
         else
         {
@@ -1040,6 +1217,8 @@ public class GameManagerController : MonoBehaviour
                 SetCurrentSideViewLayer(0);
 
             SetCurrentSubGridView(sideViewActiveGrid);
+
+            activeLayerText.gameObject.SetActive(true);
         }
         transitionManager.onTransitionCutPointReached -= OnTransitionEndSwitchViewMode;
     }

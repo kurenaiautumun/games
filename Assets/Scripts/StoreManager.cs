@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Collections;
 
 public class StoreManager : MonoBehaviour
 {
+    
     public GameObject plantItem;
     List<PlantObject> plantObjects = new List<PlantObject>();
+
+    
     private void Awake()
     {
         //Assets/Resources/Plants
@@ -18,11 +22,16 @@ public class StoreManager : MonoBehaviour
 
         foreach (var plant in plantObjects)
         {
+            plantItem.SetActive(true);
             PlantItem newPlant = Instantiate(plantItem, transform).GetComponent<PlantItem>();
+            
             newPlant.plant = plant;
         }
     }
 
+    
+
+    
     int SortByPrice(PlantObject plantObject1, PlantObject plantObject2)
     {
         return plantObject1.buyPrice.CompareTo(plantObject2.buyPrice);
@@ -32,4 +41,6 @@ public class StoreManager : MonoBehaviour
     {
         return plantObject1.timeBtwStages.CompareTo(plantObject2.timeBtwStages);
     }
+
+    
 }

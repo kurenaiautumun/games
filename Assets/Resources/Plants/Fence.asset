@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   plantName: Corn
   plantStages:
+  - {fileID: 0}
   - {fileID: 21300000, guid: b730fb83a5b983e428ad65b62191b696, type: 3}
-  timeBtwStages: 0
-  buyPrice: 40
-  sellPrice: 20
-  icon: {fileID: -1746404796, guid: 980fe03dd44f28a47b779851349b7f1a, type: 3}
+  timeBtwStages: 5
+  buyPrice: 100
+  sellPrice: 80
+  icon: {fileID: 21300000, guid: b730fb83a5b983e428ad65b62191b696, type: 3}
   dryPlanted: {fileID: 21300000, guid: b730fb83a5b983e428ad65b62191b696, type: 3}

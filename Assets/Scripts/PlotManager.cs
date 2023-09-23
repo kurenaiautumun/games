@@ -1,14 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Collections;
 
 public class PlotManager : MonoBehaviour
 {
+    public static PlotManager instance;
+    private PlantObject item;
     //Slider
     public float Progress = 10f;
 
     bool isPlanted = false;
-    SpriteRenderer plant;
+    public  SpriteRenderer plant;
     BoxCollider2D plantCollider;
 
     int plantStage = 0;
@@ -18,6 +21,7 @@ public class PlotManager : MonoBehaviour
     public Color unavailableColor = Color.red;
 
     SpriteRenderer plot;
+    bool requirement = false;
 
 
     PlantObject selectedPlant;
@@ -32,6 +36,12 @@ public class PlotManager : MonoBehaviour
     float speed=1f;
     public bool isBought=true;
 
+    [ReadOnly()] public PlaceableObjectsData data = new PlaceableObjectsData();
+
+    private void Awake() {
+        instance = this;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,6 +49,7 @@ public class PlotManager : MonoBehaviour
         plantCollider = transform.GetChild(0).GetComponent<BoxCollider2D>();
         fm = transform.parent.GetComponent<FarmManager>();
         plot = GetComponent<SpriteRenderer>();
+        
         if (isBought)
         {
             plot.sprite = drySprite;
@@ -50,14 +61,28 @@ public class PlotManager : MonoBehaviour
         
     }
 
+    public void Initailize(PlantObject pItem)
+    {
+        Debug.Log("Initailize");
+        selectedPlant = pItem;
+        data.assetName = selectedPlant.plantName;
+        data.ID = SaveData.GenerateId();
+    }
+
+    public void Initailize(PlantObject pItem, PlaceableObjectsData objectsData)
+    {
+        selectedPlant = pItem;
+        data = objectsData;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (isPlanted && !isDry)
+        if (isPlanted && !isDry )//&& selectedPlant.buyPrice < 30)
         {
             timer -= speed*Time.deltaTime;
 
-            if (timer < 0 && plantStage<selectedPlant.plantStages.Length-1)
+            if (timer < 0 && plantStage<selectedPlant.plantStages.Length-1 )
             {
                 timer = selectedPlant.timeBtwStages;
                 plantStage++;
@@ -70,12 +95,47 @@ public class PlotManager : MonoBehaviour
     {
         if (isPlanted)
         {
-            if (plantStage == selectedPlant.plantStages.Length - 1 && !fm.isPlanting && !fm.isSelecting)
+            
+            if (plantStage == selectedPlant.plantStages.Length - 1 && !fm.isPlanting && !fm.isSelecting && selectedPlant.buyPrice < 30 )
             {
                 Harvest();
             }
+            else 
+            {
+                if(selectedPlant.plantName == "Cow")
+                {
+                    if(requirement)
+                    {
+                        Debug.Log("Milk");
+                        requirement = false;
+                        plantStage=0;
+                        plant.sprite = selectedPlant.plantStages[plantStage];
+                       
+                    }
+                    else{
+                        Debug.Log("Food Require");
+                        requirement = true;
+                        plantStage=1;
+                        plant.sprite = selectedPlant.plantStages[plantStage];
+                    }
+                }
+                else if(selectedPlant.plantName == "Barn")
+                {
+                    if(requirement)
+                    {
+                        Debug.Log("Supply");
+                        requirement = false;
+                    }
+                    else{
+                        Debug.Log("Barn");
+                        requirement = true;
+                    }
+                }
+                
+            }
+            
         }
-        else if(fm.isPlanting && fm.selectPlant.plant.buyPrice <= fm.money && isBought)
+        else if(fm.isPlanting && fm.selectPlant.plant.buyPrice <= fm.money && (isBought ))
         {
             Plant(fm.selectPlant.plant);
         }
@@ -84,7 +144,7 @@ public class PlotManager : MonoBehaviour
             switch (fm.selectedTool)
             {
                 case 1:
-                    if (isBought) {
+                    if (isBought ) {
                         isDry = false;
                         plot.sprite = normalSprite;
                         if (isPlanted) UpdatePlant();
@@ -190,6 +250,8 @@ public class PlotManager : MonoBehaviour
         UpdatePlant();
         timer = selectedPlant.timeBtwStages;
         plant.gameObject.SetActive(true);
+        var obj = plant.gameObject;
+         obj.GetComponent<PlotManager>().Initailize(item);
     }
 
     void UpdatePlant()
@@ -204,6 +266,12 @@ public class PlotManager : MonoBehaviour
         }
         plantCollider.size = plant.sprite.bounds.size;
         plantCollider.offset = new Vector2(0,plant.bounds.size.y/2);
+    }
+
+    private void OnApplicationQuit() {
+        Debug.Log("OnApplicationQuit");
+        data.position = transform.position;
+        FarmManager.instance.saveData.AddData(data);
     }
 
 }

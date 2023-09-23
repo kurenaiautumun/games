@@ -7,7 +7,7 @@ public class FarmManager : MonoBehaviour
 {
     public PlantItem selectPlant;
     public bool isPlanting = false;
-    public int money=100;
+    public int money= 500;
     public Text moneyTxt;
 
     public Color buyColor = Color.green;
@@ -21,10 +21,21 @@ public class FarmManager : MonoBehaviour
     public Sprite normalButton;
     public Sprite selectedButton;
 
+    public static FarmManager instance;
+
+
+    public SaveData saveData;
+    [SerializeField] private string shopItemsPath = "Shop";
+
+    private void Awake() {
+        instance = this;
+        SaveSystem.Initailize();
+    }
     // Start is called before the first frame update
     void Start()
     {
         moneyTxt.text = "$" + money;
+        LoadGame();
     }
 
     public void SelectPlant(PlantItem newPlant)
@@ -90,4 +101,35 @@ public class FarmManager : MonoBehaviour
         moneyTxt.text = "$" + money;
     }
 
+    private void LoadGame()
+    {
+         Debug.Log("Cannot Load1");
+        LoadPlaceableObjects();
+    }
+    private void LoadPlaceableObjects()
+    {Debug.Log("Cannot Load2");
+        foreach(var plObjData in saveData.placeableobjectDatas.Values)
+        {Debug.Log("Cannot Load3");
+            try
+            {
+                 Debug.Log("Cannot Load4");
+                PlantObject item = Resources.Load<PlantObject>(shopItemsPath + "/" + plObjData.assetName);
+                PlotManager.instance.plant.gameObject.SetActive(true) ;
+                GameObject obj = PlotManager.instance.plant.gameObject ;
+                PlotManager plObj = obj.GetComponent<PlotManager>();
+                plObj.Initailize(item, plObjData);
+                //incase set active false nhi hots toh poora likh ke try krna yha pe 
+            }
+            catch (System.Exception)
+            {
+                Debug.Log("Cannot Load");
+                //throw;
+            }
+        }
+    }
+
+    private void OnDisable() {
+        SaveSystem.Save(saveData);
+        
+    }
 }

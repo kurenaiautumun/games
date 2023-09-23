@@ -24,7 +24,7 @@ public class PlotManager : MonoBehaviour
     bool requirement = false;
 
 
-    PlantObject selectedPlant;
+   public PlantObject selectedPlant;
 
     FarmManager fm;
 
@@ -45,9 +45,14 @@ public class PlotManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //Debug.Log("Start");
+
         plant = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        Debug.Log(plant);
+        //plant.gameObject = transform.GetChild(0).GetComponent<PlotManager>();
         plantCollider = transform.GetChild(0).GetComponent<BoxCollider2D>();
         fm = transform.parent.GetComponent<FarmManager>();
+       
         plot = GetComponent<SpriteRenderer>();
         
         if (isBought)
@@ -64,8 +69,11 @@ public class PlotManager : MonoBehaviour
     public void Initailize(PlantObject pItem)
     {
         Debug.Log("Initailize");
-        selectedPlant = pItem;
-        data.assetName = selectedPlant.plantName;
+        //selectedPlant = ;
+       // Debug.Log(plant);
+        //Debug.Log(selectedPlant.plantName);
+        //data.assetName = selectedPlant.plantName;
+        data.assetName = "Cow";
         data.ID = SaveData.GenerateId();
     }
 
@@ -239,19 +247,23 @@ public class PlotManager : MonoBehaviour
             ProgressBar.instance.slider.value += ProgressBar.instance.FillSpeed * Time.deltaTime;
     }
 
-    void Plant(PlantObject newPlant)
+    public void Plant(PlantObject newPlant)
     {
         selectedPlant = newPlant;
         isPlanted = true;
 
-        fm.Transaction(-selectedPlant.buyPrice);
+//        fm.Transaction(-selectedPlant.buyPrice);
 
         plantStage = 0;
-        UpdatePlant();
+        //UpdatePlant();
         timer = selectedPlant.timeBtwStages;
         plant.gameObject.SetActive(true);
+        
         var obj = plant.gameObject;
-         obj.GetComponent<PlotManager>().Initailize(item);
+       
+         //plant.gameObject.AddComponent<PlotManager>();
+         Debug.Log(item);
+        //obj.GetComponent<PlotManager>().Initailize(item);
     }
 
     void UpdatePlant()
@@ -268,8 +280,13 @@ public class PlotManager : MonoBehaviour
         plantCollider.offset = new Vector2(0,plant.bounds.size.y/2);
     }
 
+    public void DefaultPlant()
+    {
+        Plant(fm.selectPlant.plant);
+    }
+
     private void OnApplicationQuit() {
-        Debug.Log("OnApplicationQuit");
+        //Debug.Log("OnApplicationQuit");
         data.position = transform.position;
         FarmManager.instance.saveData.AddData(data);
     }

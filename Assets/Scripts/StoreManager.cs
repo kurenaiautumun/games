@@ -8,6 +8,8 @@ public class StoreManager : MonoBehaviour
     
     public GameObject plantItem;
     List<PlantObject> plantObjects = new List<PlantObject>();
+    public GameObject planting;
+    PlantObject plobj;
 
     
     private void Awake()
@@ -27,6 +29,21 @@ public class StoreManager : MonoBehaviour
             
             newPlant.plant = plant;
         }
+    }
+    private void Start() {
+        planting = GameObject.Find("Plot(270)");
+        var o = planting.GetComponent<PlotManager>();
+        Debug.Log(FindObjectsOfType<PlantItem>().Length);
+        var p1 = FindObjectsOfType<PlantItem>();
+        foreach (var p in p1)
+        {
+            Debug.Log(p);
+           
+            Debug.Log(p.plant);
+             o.Plant(selectedPlant.plant);
+        }
+        
+        Debug.Log(planting);
     }
 
     

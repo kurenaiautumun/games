@@ -20,11 +20,13 @@ public class FarmManager : MonoBehaviour
     public Image[] buttonsImg;
     public Sprite normalButton;
     public Sprite selectedButton;
+    PlantObject pb;
 
     public static FarmManager instance;
 
 
     public SaveData saveData;
+    
     [SerializeField] private string shopItemsPath = "Shop";
 
     private void Awake() {
@@ -35,6 +37,7 @@ public class FarmManager : MonoBehaviour
     void Start()
     {
         moneyTxt.text = "$" + money;
+        
         LoadGame();
     }
 
@@ -108,11 +111,12 @@ public class FarmManager : MonoBehaviour
     }
     private void LoadPlaceableObjects()
     {Debug.Log("Cannot Load2");
+        Debug.Log(saveData.placeableobjectDatas.Count);
         foreach(var plObjData in saveData.placeableobjectDatas.Values)
         {Debug.Log("Cannot Load3");
             try
             {
-                 Debug.Log("Cannot Load4");
+                Debug.Log("Cannot Load4");
                 PlantObject item = Resources.Load<PlantObject>(shopItemsPath + "/" + plObjData.assetName);
                 PlotManager.instance.plant.gameObject.SetActive(true) ;
                 GameObject obj = PlotManager.instance.plant.gameObject ;

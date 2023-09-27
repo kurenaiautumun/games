@@ -61,6 +61,7 @@
     <Compile Include="Assets\Scripts\GridMesh.cs" />
     <Compile Include="Assets\Scripts\GridObject.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\Transition.cs" />
+    <Compile Include="Assets\Scripts\PauseMenuController.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\GameManagerController.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\TransitionSettings.cs" />
@@ -68,7 +69,6 @@
     <Compile Include="Assets\External\EasyTransitions\Scripts\CutoutMaskUI.cs" />
     <Compile Include="Assets\Scripts\MainMenuController.cs" />
     <Compile Include="Assets\Scripts\ItemPickerController.cs" />
-    <Compile Include="Assets\PauseMenuController.cs" />
     <Compile Include="Assets\External\EasyTransitions\Demo\DemoLoadScene.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\TransitionManager.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />

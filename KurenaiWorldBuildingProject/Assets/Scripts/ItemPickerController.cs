@@ -27,6 +27,7 @@ public class ItemPickerController : MonoBehaviour
         }
 
         dropdown.value = 0;
+        dropdown.RefreshShownValue();
     }
 
     public GameObject GetItem(int id = -1)

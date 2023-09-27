@@ -27,6 +27,10 @@ public class PauseMenuController : MonoBehaviour
     {
         gameManagerController = GetComponent<GameManagerController>();
         selectedFilePath = "";
+
+        pauseContainer.SetActive(true);
+        saveFileContainer.SetActive(false);
+        loadFileContainer.SetActive(false);
     }
 
     public void SaveButtonPressed()
@@ -96,8 +100,6 @@ public class PauseMenuController : MonoBehaviour
             buttons[i].interactable = true;
 
         btn.interactable = false;
-
-        Debug.Log(selectedFilePath);
     }
 
     public void LoadMap() 

@@ -43,7 +43,7 @@ public class PlayingField
 
     public Vector2Int GetSubGrid(int index)
     {
-        return new Vector2Int(index % subGridSize.x, index / subGridSize.x);
+        return new Vector2Int(index % subGridCount.x, index / subGridCount.x);
     }
 
     public int GetSubGridIndex(Vector2Int pos)
@@ -80,7 +80,7 @@ public class PlayingField
         return rowObjects;
     }
 
-    public GameObject[] this[int row]
+    public GameObject[] this[int row] 
     {
         get => GetRow(row);
     }

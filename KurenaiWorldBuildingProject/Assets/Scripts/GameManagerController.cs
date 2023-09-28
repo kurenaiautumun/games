@@ -1,25 +1,16 @@
 using EasyTransition;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Xml.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
-using static System.TimeZoneInfo;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using static UnityEditor.PlayerSettings;
-using static UnityEditor.Progress;
 using Color = UnityEngine.Color;
 
 public enum GridInteractionMode {Select, Place, Clear };
 
+
+// Classes related to map operations (save/load)
 [Serializable]
 public class LoadableObjects
 {
@@ -75,7 +66,7 @@ public class GameManagerController : MonoBehaviour
     private GameObject[] topDownObjectsHierarchy;
     private GameObject[] crossGridObjectsHierarchy;
     private GameObject[] sideViewSpriteMasks;
-    private Vector2Int sideViewScreenSizeInWorldCoordinates;
+    private Vector2 sideViewScreenSizeInWorldCoordinates;
     private float sideViewXGapBetweenObjects;
 
     [Header("Grid Section")]
@@ -86,6 +77,7 @@ public class GameManagerController : MonoBehaviour
     [SerializeField] private int gridsPerMapCount = 1;
     [SerializeField] private Color boundaryColor, subgridColor;
     [HideInInspector] public GridInteractionMode gridInteractionMode = GridInteractionMode.Select;
+    [SerializeField] private float worldBoundarySizeMult = 1f, subGridBoundarySizeMult = 1f;
     private GameObject gridHighlight;
     private GameObject boundaryHighlight;
 
@@ -155,12 +147,13 @@ public class GameManagerController : MonoBehaviour
         crossGridObjectsHierarchy[0].SetActive(true);
 
         var gridControlPanel = gameUIPanelContainer.transform.GetChild(0).gameObject;
-        var parentPanetHeight = gameUIPanelContainer.transform.parent.GetComponent<RectTransform>().sizeDelta.y;
-        gridControlPanel.GetComponent<RectTransform>().sizeDelta = new Vector2(gridControlPanel.GetComponent<RectTransform>().sizeDelta.x, parentPanetHeight - 300);
+        var generalControlPanelHeight = gameUIPanelContainer.transform.GetChild(1).gameObject.GetComponent<RectTransform>().sizeDelta.y;
+        var parentPanelHeight = gameUIPanelContainer.transform.parent.GetComponent<RectTransform>().sizeDelta.y;
+        gridControlPanel.GetComponent<RectTransform>().sizeDelta = new Vector2(gridControlPanel.GetComponent<RectTransform>().sizeDelta.x, parentPanelHeight - generalControlPanelHeight);
 
         Camera.main.orthographicSize = sideViewZoom;
         var screenWidth = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
-        sideViewScreenSizeInWorldCoordinates = new Vector2Int((int)screenWidth.x, (int)screenWidth.y);
+        sideViewScreenSizeInWorldCoordinates = new Vector2(screenWidth.x, screenWidth.y);
         Camera.main.orthographicSize = topDownViewZoom;
     }
 
@@ -312,8 +305,9 @@ public class GameManagerController : MonoBehaviour
         boundaryHighlight.GetComponent<LineRenderer>().SetPosition(1, Vector3.right * gridCellSize * playingFields[topViewActiveGrid].size.x);
         boundaryHighlight.GetComponent<LineRenderer>().SetPosition(2, new Vector3(playingFields[topViewActiveGrid].size.x, playingFields[topViewActiveGrid].size.y, 0) * gridCellSize);
         boundaryHighlight.GetComponent<LineRenderer>().SetPosition(3, Vector3.up * gridCellSize * playingFields[topViewActiveGrid].size.y);
+        boundaryHighlight.GetComponent<LineRenderer>().widthMultiplier = worldBoundarySizeMult;
 
-        if(boundsHierarchy != null)
+        if (boundsHierarchy != null)
             Destroy(boundsHierarchy);
 
         // Sub grid boundaries
@@ -334,7 +328,7 @@ public class GameManagerController : MonoBehaviour
                 line.SetPosition(1, Vector3.right * gridCellSize * playingFieldSubGridSize.x);
                 line.SetPosition(2, new Vector3(playingFieldSubGridSize.x, playingFieldSubGridSize.y, 0) * gridCellSize);
                 line.SetPosition(3, Vector3.up * gridCellSize * playingFieldSubGridSize.y);
-
+                line.widthMultiplier = subGridBoundarySizeMult;
             }
         }
     }
@@ -458,16 +452,9 @@ public class GameManagerController : MonoBehaviour
     private void MoveCamera(Vector2 displacement)
     {
         Vector3 camPos = Camera.main.transform.position;
-        camPos -= new Vector3(displacement.x, displacement.y, 0) * Time.deltaTime;
+        camPos -= new Vector3(isSideModeEnabled ? 0 : displacement.x, displacement.y, 0) * Time.deltaTime;
 
-        if(isSideModeEnabled)
-        {
-            if (camPos.x > -playingFieldOrigin.x * gridCellSize * playingFieldCount)
-                camPos.x = -playingFieldOrigin.x * gridCellSize * playingFieldCount;
-            else if (camPos.x < playingFieldOrigin.x * gridCellSize)
-                camPos.x = playingFieldOrigin.x * gridCellSize;
-        }
-        else
+        if (!isSideModeEnabled)
         {
             if (camPos.x > -playingFieldOrigin.x * gridCellSize)
                 camPos.x = -playingFieldOrigin.x * gridCellSize;
@@ -737,7 +724,7 @@ public class GameManagerController : MonoBehaviour
         if(isSideModeEnabled)
         {
             var gridPos = playingFields[topViewActiveGrid].GetSubGrid(grid);
-            Camera.main.transform.position = new Vector3(gridPos.x * sideViewScreenSizeInWorldCoordinates.x * 2, 0, Camera.main.transform.position.z);
+            Camera.main.transform.position = new Vector3(gridPos.x * sideViewScreenSizeInWorldCoordinates.x * 2 + sideViewXGapBetweenObjects, 0, Camera.main.transform.position.z);
 
             //Debug.Log(gridPos + "   :   " + screenWidth + "   :   " + Screen.width);
 
@@ -1012,6 +999,7 @@ public class GameManagerController : MonoBehaviour
         mapData.name = fileName;
         mapData.gridCount = gridsPerMapCount;
 
+        // Loop through each grid in the map and get the data for each object
         for(int i=0;i<gridsPerMapCount;i++)
         {
             GridData gridData = new GridData();
@@ -1042,6 +1030,7 @@ public class GameManagerController : MonoBehaviour
             mapData.grids.Add(gridData);
         }   
         
+        // Convert to JSON and write to file
         jsonString += JsonUtility.ToJson(mapData);
         string savePath = Path.Combine(baseSavePath, fileName + ".json");
         StreamWriter writer = new StreamWriter(savePath, false);

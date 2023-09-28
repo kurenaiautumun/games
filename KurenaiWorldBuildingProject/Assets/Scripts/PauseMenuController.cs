@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class PauseMenuController : MonoBehaviour
@@ -119,6 +116,18 @@ public class PauseMenuController : MonoBehaviour
 
         if (gameManagerController.isSideModeEnabled)
             gameManagerController.SwitchViewMode(true);
+    }
+
+    public void DeleteMap()
+    {
+        if (selectedFilePath.Length <= 0)
+            return;
+
+        File.Delete(selectedFilePath);
+        for (int i = loadContentHierarchy.transform.childCount - 1; i >= 0; i--)
+            Destroy(loadContentHierarchy.transform.GetChild(i).gameObject);
+
+        LoadButtonPressed();
     }
 
     public void NewMap()

@@ -12,12 +12,24 @@
             "deviceId": "RZ8NB1FA0YF",
             "name": "com.DefaultCompany.com.unity.template.mobile2D",
             "processId": 4444,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "RZ8NB1FA0YF",
             "name": "com.DefaultCompany.com.unity.template.mobile2D",
             "processId": 9513,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8NB1FA0YF",
+            "name": "com.DefaultCompany.com.unity.template.mobile2D",
+            "processId": 8706,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8NB1FA0YF",
+            "name": "com.DefaultCompany.com.unity.template.mobile2D",
+            "processId": 9844,
             "exited": false
         }
     ],

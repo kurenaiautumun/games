@@ -6,4 +6,6 @@ KurenaiWorldBuildingProject/Temp/
 
 KurenaiWorldBuildingProject/.vsconfig
 
-App/
+# Ignore everything except apk files
+App/*
+!App/*.apk

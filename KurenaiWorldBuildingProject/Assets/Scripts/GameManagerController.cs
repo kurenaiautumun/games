@@ -108,6 +108,7 @@ public class GameManagerController : MonoBehaviour
     private bool hasInputTouchOverUI;
     private bool isGamePaused;
     public string baseSavePath;
+    private string baseScreenshotPath;
 
     void Start()
     {
@@ -139,6 +140,10 @@ public class GameManagerController : MonoBehaviour
         if(!Directory.Exists(baseSavePath))
             Directory.CreateDirectory(baseSavePath);
 
+        baseScreenshotPath = Path.Combine(Application.persistentDataPath, "screenshot");
+        if (!Directory.Exists(baseScreenshotPath))
+            Directory.CreateDirectory(baseScreenshotPath);
+
         isGamePaused = false;
         gameUIPanelContainer.SetActive(true);
         pausePanelContainer.SetActive(false);
@@ -155,6 +160,8 @@ public class GameManagerController : MonoBehaviour
         var screenWidth = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
         sideViewScreenSizeInWorldCoordinates = new Vector2(screenWidth.x, screenWidth.y);
         Camera.main.orthographicSize = topDownViewZoom;
+
+        
     }
 
     void Update()
@@ -1212,6 +1219,38 @@ public class GameManagerController : MonoBehaviour
     public void ReturnToMainMenu()
     {
         transitionManager.Transition("MainMenuScene", transition, 0f);
+    }
+
+    public void CaptureScreenshot()
+    {
+        var cam = Camera.main.GetComponent<Camera>();
+
+        RenderTexture screenTexture = new RenderTexture(Screen.width, Screen.height, 16);
+        cam.targetTexture = screenTexture;
+        RenderTexture.active = screenTexture;
+
+        // Render the view to the texture rather than the screen
+        cam.Render();
+        Texture2D renderedTexture = new Texture2D(Screen.width, Screen.height);
+        renderedTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        RenderTexture.active = null;
+        byte[] byteArray = renderedTexture.EncodeToPNG();
+
+        // Automatically find an unused filename to save
+        for(int i=0;i<65535;i++)
+        {
+            var filename = "capture" + i + ".png";
+            var filePath = Path.Combine(baseScreenshotPath, filename);
+            if(!File.Exists(filePath))
+            {
+                File.WriteAllBytes(filePath, byteArray);
+                break;
+            }
+        }
+
+        // Disable the rendertextures
+        cam.targetTexture = null;
+        RenderTexture.active = null;
     }
 
     public void SwitchInteractionMode(GameObject buttonGameObject)

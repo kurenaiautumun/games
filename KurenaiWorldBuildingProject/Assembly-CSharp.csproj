@@ -59,19 +59,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\GridMesh.cs" />
+    <Compile Include="Assets\inGameCharacterBinderScript.cs" />
+    <Compile Include="Assets\External\DDSystem\Demo\Scripts\TestMessage_Selection.cs" />
     <Compile Include="Assets\Scripts\GridObject.cs" />
+    <Compile Include="Assets\External\DDSystem\Script\DialogBase.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\Transition.cs" />
+    <Compile Include="Assets\External\DDSystem\Demo\Scripts\TestMessage.cs" />
     <Compile Include="Assets\Scripts\PauseMenuController.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Scripts\MapManagerController.cs" />
     <Compile Include="Assets\Scripts\GameManagerController.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\TransitionSettings.cs" />
     <Compile Include="Assets\Scripts\PlayingField.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\CutoutMaskUI.cs" />
     <Compile Include="Assets\Scripts\MainMenuController.cs" />
+    <Compile Include="Assets\External\DDSystem\Script\DialogManager.cs" />
     <Compile Include="Assets\Scripts\ItemPickerController.cs" />
+    <Compile Include="Assets\speechTestScript.cs" />
+    <Compile Include="Assets\Scripts\MapMarkerInfoObject.cs" />
+    <Compile Include="Assets\External\DDSystem\Script\Character.cs" />
     <Compile Include="Assets\External\EasyTransitions\Demo\DemoLoadScene.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\TransitionManager.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
+    <Compile Include="Assets\External\DDSystem\Script\EmotionDrawer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
@@ -81,6 +91,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\External\DDSystem\Graphic\NANUM_LICENSE.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />

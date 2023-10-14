@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Color = UnityEngine.Color;
+using Doublsb.Dialog;
 
 public enum GridInteractionMode {Select, Place, Clear };
 
@@ -102,6 +103,7 @@ public class GameManagerController : MonoBehaviour
 
     [Header("Misc Section")]
     public CameraController cameraController;
+    private DialogManager dialogManager;
 
     private Vector2 previousTouchLocation;
     private bool hasInputTouchDragged;
@@ -120,6 +122,8 @@ public class GameManagerController : MonoBehaviour
             Debug.LogError("Wrong size for playing field");
             return;
         }
+
+        dialogManager = GameObject.Find("DialogAsset").GetComponent<DialogManager>();
         
         previousTouchLocation = new Vector3(Screen.width / 2, Screen.height / 2, 0);
 
@@ -272,6 +276,11 @@ public class GameManagerController : MonoBehaviour
                                     
                             }
 
+                            if(gridInteractionMode == GridInteractionMode.Select)
+                            {
+                                SelectSideViewObject(touchWorldPos);
+                            }
+
                             if (gridInteractionMode == GridInteractionMode.Place)
                                 Debug.Log(gridPos);
                         }
@@ -283,7 +292,61 @@ public class GameManagerController : MonoBehaviour
         }
 
     }
-        
+
+    private void SelectSideViewObject(Vector2 touchWorldPos)
+    {
+        GameObject selectedObject = null;
+        for(int i=0;i< crossGridObjectsHierarchy[topViewActiveGrid].transform.childCount;i++)
+        {
+            var child = crossGridObjectsHierarchy[topViewActiveGrid].transform.GetChild(i);
+            var childPos = new Vector2(child.position.x, child.position.y);
+            var gridObjComp = child.GetComponent<GridObject>();
+            var lowerLeftCorner = gridObjComp.GetSpriteLowerLeftCorner() + childPos;
+            var upperRightCorner = gridObjComp.GetSpriteUpperRightCorner() + childPos;
+
+            if (touchWorldPos.x < lowerLeftCorner.x || touchWorldPos.y < lowerLeftCorner.y ||
+                touchWorldPos.x > upperRightCorner.x || touchWorldPos.y > upperRightCorner.y)
+                continue;
+
+            selectedObject = child.gameObject;
+            break;
+        }
+
+        if(selectedObject == null)
+        {
+            for (int i = 0; i < topDownSubGrids.Length; i++)
+            {
+                if (!topDownSubGrids[i].activeInHierarchy)
+                    continue;
+
+                var hierarchy = topDownSubGrids[i];
+                for(int j = 0; j < hierarchy.transform.childCount; j++)
+                {
+                    var child = hierarchy.transform.GetChild(j);
+                    var childPos = new Vector2(child.position.x, child.position.y);
+                    var gridObjComp = child.GetComponent<GridObject>();
+                    var lowerLeftCorner = gridObjComp.GetSpriteLowerLeftCorner() + childPos;
+                    var upperRightCorner = gridObjComp.GetSpriteUpperRightCorner() + childPos;
+
+                    if (touchWorldPos.x < lowerLeftCorner.x || touchWorldPos.y < lowerLeftCorner.y ||
+                        touchWorldPos.x > upperRightCorner.x || touchWorldPos.y > upperRightCorner.y)
+                        continue;
+
+                    selectedObject = child.gameObject;
+                    break;
+                }
+            }
+        }
+
+        if (selectedObject!= null)
+        {
+            selectedObject.GetComponent<SpriteRenderer>().color = Color.black;
+
+            DialogData dialog = new DialogData("Selected: " + selectedObject.name, "Test");
+            dialogManager.Show(dialog);
+        }
+    }
+
     // Converts a world position into grid position
     private Vector3 GetGridPosition(Vector3 worldPos)
     {

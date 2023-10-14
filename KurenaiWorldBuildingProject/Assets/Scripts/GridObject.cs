@@ -33,5 +33,10 @@ public class GridObject : MonoBehaviour
     {
         return gameObject.GetComponent<SpriteRenderer>().sprite.bounds.min * scale;
     }
+
+    public Vector2 GetSpriteUpperRightCorner()
+    {
+        return gameObject.GetComponent<SpriteRenderer>().sprite.bounds.max * scale;
+    }
 }
 

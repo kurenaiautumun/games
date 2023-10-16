@@ -263,6 +263,9 @@ namespace Doublsb.Dialog
 
                 while (state != State.Deactivate) { yield return null; }
             }
+
+            if (OnDialogEndedEvent != null)
+                OnDialogEndedEvent();
         }
 
         private IEnumerator Activate()
@@ -367,6 +370,9 @@ namespace Doublsb.Dialog
 
         public delegate void _printfinisheddelegate();
         public event _printfinisheddelegate OnPrintFinishedEvent;
+
+        public delegate void _dialogendeddelegate();
+        public event _dialogendeddelegate OnDialogEndedEvent;
 
         public GameObject GetCurrentInGameCharacter()
         {

@@ -11,7 +11,9 @@ public class speechTestScript : MonoBehaviour
     private RectTransform printerRectTransform, textRectTransform;
 
     public GameObject originalRPGFormatDialogPrefab;
-    public GameObject character;
+    public bool flipBubbleWithCharacter = true;
+
+    private GameObject currentTalkingCharacter;
 
     void Start()
     {
@@ -26,6 +28,7 @@ public class speechTestScript : MonoBehaviour
 
     void Update()
     {
+        // For some reason the buttons aren't responding properly so we take keyboard input for now
         if(Input.GetKeyUp(KeyCode.Return)) {
             dialogManager.Click_Window();
         }
@@ -34,39 +37,73 @@ public class speechTestScript : MonoBehaviour
     private void ShowTestDialog()
     {
         // Type of dialog
-        dialogManager.OnPrintEvent += BubbleDialog;
         dialogManager.OnPrintStartEvent += SwitchCurrentActiveTalkingCharacter;
+        dialogManager.OnPrintEvent += BubbleDialog;
+        dialogManager.OnDialogEndedEvent += FinishedDialog;
         //RPGDialog();
 
         // Conversation
         var dialogTexts = new List<DialogData>();
         dialogTexts.Add(new DialogData("Hello!", "RandomChar"));
-        dialogTexts.Add(new DialogData("Hello to you too!", "Character2"));
+        dialogTexts.Add(new DialogData("Hello to \nyou too!", "Character2"));
         dialogTexts.Add(new DialogData("Nice meeting you here.", "RandomChar"));
         dialogTexts.Add(new DialogData("Same!", "Character2"));
         dialogManager.Show(dialogTexts);
-
-        //dialogManager.OnPrintEvent -= BubbleDialog;
-        //dialogManager.OnPrintFinishedEvent -= SwitchCurrentActiveTalkingCharacter;
+    }
+    private void FinishedDialog()
+    {
+        // Unhook the functions from the events
+        dialogManager.OnPrintEvent -= BubbleDialog;
+        dialogManager.OnPrintFinishedEvent -= SwitchCurrentActiveTalkingCharacter;
+        dialogManager.OnDialogEndedEvent -= FinishedDialog;
     }
 
     private void SwitchCurrentActiveTalkingCharacter()
     {
-        character = dialogManager.GetCurrentInGameCharacter();
+        // Get the current talking character
+        currentTalkingCharacter = dialogManager.GetCurrentInGameCharacter();
+
+        // Find the mouth position if it exists
+        var characterPos = currentTalkingCharacter.transform.Find("Mouth").gameObject.GetComponent<Transform>().position;
+        if (characterPos == null)
+            characterPos = currentTalkingCharacter.transform.position;
+
+        // Convert the world space position to screen position for UI elements
+        var bubbleScreenPos = Camera.main.WorldToScreenPoint(characterPos);
+        printerObject.transform.position = bubbleScreenPos;
+
+        // If flip is enabled, then bubble speech will flip accordingly (make sure the image is proper)
+        if (flipBubbleWithCharacter)
+        {
+            var pls = printerObject.transform.localScale;
+            var tls = textObject.transform.localScale;
+            if (currentTalkingCharacter.GetComponent<SpriteRenderer>().flipX)
+            {
+                printerObject.transform.localScale = new Vector3(-1, 1, 1);
+                textObject.transform.localScale = new Vector3(-1, 1, 1);
+                textRectTransform.pivot = new Vector3(1, 0.5f, 0);
+            }
+            else
+            {
+                printerObject.transform.localScale = Vector3.one;
+                textObject.transform.localScale = Vector3.one;
+                textRectTransform.pivot = new Vector3(0, 0.5f, 0);
+            }
+        }
     }
 
+    // New bubble dialog
     private void BubbleDialog()
     {
         textObject.GetComponent<HorizontalLayoutGroup>().enabled = true;
         textObject.GetComponent<ContentSizeFitter>().enabled = true;
 
-        var characterScreenPos = Camera.main.WorldToScreenPoint(character.transform.position);
-        printerObject.transform.position = characterScreenPos + new Vector3(50, 50, 0);
-
+        // Resize the printer
         var finalSize = textRectTransform.sizeDelta + new Vector2(80, 50);
         printerRectTransform.sizeDelta = finalSize;
     }
 
+    // RPG Dialog available by default
     private void RPGDialog()
     {
         var po = originalRPGFormatDialogPrefab.transform.GetChild(0).gameObject;

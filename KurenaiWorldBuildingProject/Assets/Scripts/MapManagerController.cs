@@ -46,6 +46,7 @@ public class MapManagerController : MonoBehaviour
     void Update()
     {
         HandleTouchInput();
+        HandleMouseKeyboardInput();
     }
 
     private void HandleTouchInput()
@@ -111,21 +112,77 @@ public class MapManagerController : MonoBehaviour
             float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
             float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
 
-            float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+            float deltaMagnitudeDiff = touchDeltaMag - prevTouchDeltaMag;
 
             // Zoom in/out
-            if (deltaMagnitudeDiff > 0)
-            {
-                zoom = Mathf.Min(zoom + zoomSpeed, maxZoom);
-                Camera.main.orthographicSize = zoom;
-            }
-            else if (deltaMagnitudeDiff < 0)
-            {
-                zoom = Mathf.Max(zoom - zoomSpeed, minZoom);
-                Camera.main.orthographicSize = zoom;
-            }
+            ZoomCamera(deltaMagnitudeDiff);
         }
     }
+
+    private void HandleMouseKeyboardInput()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (EventSystem.current.IsPointerOverGameObject())
+                hasInputTouchOverUI = true;
+            else
+            {
+                previousTouchLocation = Input.mousePosition;
+            }
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            if (!hasInputTouchOverUI)
+            {
+                var displacement = (Vector2)Input.mousePosition - previousTouchLocation;
+                previousTouchLocation = Input.mousePosition;
+                if (displacement.magnitude > 25)
+                {
+                    hasInputTouchDragged = true;
+                    MoveCamera(displacement);
+                }
+            }
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (!hasInputTouchOverUI)
+            {
+                if (!hasInputTouchDragged)
+                {
+                    var touchScreenPos = Input.mousePosition;
+                    var touchWorldPos = Camera.main.ScreenToWorldPoint(touchScreenPos);
+                    Collider2D collider = Physics2D.OverlapPoint(touchWorldPos);
+
+                    if (collider != null)
+                    {
+                        SelectMapMarker(collider.gameObject);
+                    }
+                }
+            }
+            hasInputTouchOverUI = false;
+            hasInputTouchDragged = false;
+        }
+
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        ZoomCamera(scroll);
+    }
+
+    private void ZoomCamera(float deltaValue)
+    {
+        if (deltaValue < 0)
+        {
+            zoom = Mathf.Min(zoom + zoomSpeed, maxZoom);
+            Camera.main.orthographicSize = zoom;
+        }
+        else if (deltaValue > 0)
+        {
+            zoom = Mathf.Max(zoom - zoomSpeed, minZoom);
+            Camera.main.orthographicSize = zoom;
+        }
+    }
+
     private void MoveCamera(Vector2 displacement)
     {
         Vector3 camPos = Camera.main.transform.position;
@@ -138,7 +195,9 @@ public class MapManagerController : MonoBehaviour
     {
         if(mapMarkerHierarchy != null)
             Destroy(mapMarkerHierarchy);
-        mapMarkerHierarchy = new GameObject("Map Markers");
+        mapMarkerHierarchy = GameObject.Find("Map Markers");
+        if(mapMarkerHierarchy == null)
+            mapMarkerHierarchy = new GameObject("Map Markers");
 
         // Create markers from given List (or even from a provided file in future)
         for (int i = 0; i < mapMarkers.Count; i++)

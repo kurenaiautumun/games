@@ -32,6 +32,14 @@ public class MapManagerController : MonoBehaviour
     [SerializeField] private List<MapMarkerInfo> mapMarkers = new List<MapMarkerInfo>();
     private GameObject mapMarkerHierarchy;
 
+    [Header("Outline Section")]
+    [SerializeField] private Material outlineMat;
+    [SerializeField] private Material spriteMat;
+    [SerializeField] private float outlinePulseSpeed = 1f, outlineMinThickness = 2f, outlineMaxThickness = 5f;
+    private float outlineTimer = 0f;
+    private GameObject currentSelectedRegion;
+    private SpriteRenderer currentSelectedRegionSpriteRenderer;
+
     private DialogManager dialogManager;
 
     void Start()
@@ -41,12 +49,75 @@ public class MapManagerController : MonoBehaviour
         dialogManager = GameObject.Find("DialogAsset").GetComponent<DialogManager>();
 
         CreateMapMarkers();
+
+        InputManager.ScrollEvent += ZoomCamera;
+        InputManager.PinchEvent += ZoomCamera;
+        InputManager.OnDragEvent += MoveCamera;
+        InputManager.OnSingleTapEvent += HandleSelection;
+
+        currentSelectedRegion = null;
+        currentSelectedRegionSpriteRenderer = null;
+    }
+
+    private void OnDestroy()
+    {
+        InputManager.ScrollEvent -= ZoomCamera;
+        InputManager.PinchEvent -= ZoomCamera;
+        InputManager.OnDragEvent -= MoveCamera;
+        InputManager.OnSingleTapEvent -= HandleSelection;
+    }
+
+    private void OnDisable()
+    {
+
     }
 
     void Update()
     {
-        HandleTouchInput();
-        HandleMouseKeyboardInput();
+        if(currentSelectedRegion != null )
+        {
+            HighlightSelectedRegion();
+        }
+    }
+
+    
+    private void HighlightSelectedRegion()
+    {
+        outlineTimer += Time.deltaTime;
+        float lerpTime = (Mathf.Sin(outlineTimer * outlinePulseSpeed) + 1) * 0.5f;
+        float thickness = Mathf.Lerp(outlineMinThickness, outlineMaxThickness, lerpTime);
+        currentSelectedRegionSpriteRenderer.material.SetFloat("_Distance", thickness);
+    }
+
+    private void HandleSelection(Vector2 pos)
+    {
+        var touchWorldPos = Camera.main.ScreenToWorldPoint(pos);
+        Collider2D collider = Physics2D.OverlapPoint(touchWorldPos);
+
+        if(collider == null)
+        {
+            if (currentSelectedRegion != null)
+            {
+                currentSelectedRegionSpriteRenderer.material = spriteMat;
+                currentSelectedRegion = null;
+            }
+        }
+
+        else
+        {
+            if (currentSelectedRegion == collider.gameObject)
+                return;
+
+            if(currentSelectedRegion != null)
+                currentSelectedRegionSpriteRenderer.material = spriteMat;
+
+            currentSelectedRegionSpriteRenderer = collider.gameObject.GetComponent<SpriteRenderer>();
+            currentSelectedRegionSpriteRenderer.material = outlineMat;
+            currentSelectedRegion = collider.gameObject;
+            outlineTimer = 0;
+
+            //SelectMapMarker(collider.gameObject);
+        }
     }
 
     private void HandleTouchInput()
@@ -218,6 +289,7 @@ public class MapManagerController : MonoBehaviour
             infoObject.mapFilePath = info.mapFilePath;
         }
     }
+ 
     private void SelectMapMarker(GameObject mapMarker)
     {
         // Show the text

@@ -59,7 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\GridMesh.cs" />
-    <Compile Include="Assets\inGameCharacterBinderScript.cs" />
     <Compile Include="Assets\External\DDSystem\Demo\Scripts\TestMessage_Selection.cs" />
     <Compile Include="Assets\Scripts\GridObject.cs" />
     <Compile Include="Assets\External\DDSystem\Script\DialogBase.cs" />
@@ -69,13 +68,15 @@
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\MapManagerController.cs" />
     <Compile Include="Assets\Scripts\GameManagerController.cs" />
+    <Compile Include="Assets\Scripts\speechTestScript.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\TransitionSettings.cs" />
     <Compile Include="Assets\Scripts\PlayingField.cs" />
     <Compile Include="Assets\External\EasyTransitions\Scripts\CutoutMaskUI.cs" />
     <Compile Include="Assets\Scripts\MainMenuController.cs" />
     <Compile Include="Assets\External\DDSystem\Script\DialogManager.cs" />
     <Compile Include="Assets\Scripts\ItemPickerController.cs" />
-    <Compile Include="Assets\speechTestScript.cs" />
+    <Compile Include="Assets\Scripts\InputManager.cs" />
+    <Compile Include="Assets\Scripts\inGameCharacterBinderScript.cs" />
     <Compile Include="Assets\Scripts\MapMarkerInfoObject.cs" />
     <Compile Include="Assets\External\DDSystem\Script\Character.cs" />
     <Compile Include="Assets\External\EasyTransitions\Demo\DemoLoadScene.cs" />
@@ -107,6 +108,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\Shaders\Outline.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,9 @@ KurenaiWorldBuildingProject/Library/
 KurenaiWorldBuildingProject/Logs/
 KurenaiWorldBuildingProject/obj/
 KurenaiWorldBuildingProject/Temp/
+KurenaiWorldBuildingProject/Assets/External/DDSystem/Demo/
 
+KurenaiWorldBuildingProject/Assets/External/DDSystem/Demo.meta
 KurenaiWorldBuildingProject/.vsconfig
 
 # Ignore everything except apk files

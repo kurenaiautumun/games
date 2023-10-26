@@ -29,25 +29,79 @@ public class InputManager : MonoBehaviour
 
     #endregion
 
+    public static bool isCanvasElementInteracted;
+
     [Header("Input Threshold Section")]
     public float timeThreshold = 0.2f;
     public float distanceThreshold = 10.0f;
     public float velocityThreshold = 50.0f;
+    public float doubleTapTimeout = 0.1f;
+
+    [Header("Interaction Section")]
+    public bool ignoreCanvasInteraction;
 
     private float initialDistance;
 
     private Vector2 startPosition;
     private float dragTimer;
-    private bool isDragging = false;
+    private bool isDragging;
+
+    private bool isCursorInsideViewport;
+
+    private float doubleTapTimer;
+    private bool isDoubleTapTimerActivated;
+
+    private void Start()
+    {
+        isDragging = false;
+        isCursorInsideViewport = false;
+        isDoubleTapTimerActivated = false;
+        isCanvasElementInteracted = false;
+
+        if (!ignoreCanvasInteraction && EventSystem.current == null)
+            Debug.LogError("Please add an EventSystem!");
+    }
 
     private void Update()
     {
+        if(!ignoreCanvasInteraction)
+        {
+            // Check if UI is being interacted
+            if (EventSystem.current.currentSelectedGameObject != null)
+            {
+                isCanvasElementInteracted = true;
+                //Debug.Log("UI element is being interacted with: " + EventSystem.current.currentSelectedGameObject.name);
+                return;
+            }
+        }
+        
         HandleTouchInput();
-        HandleMouseInput();
+        HandleMouseInput();     
+
+        if (isDoubleTapTimerActivated)
+        {
+            doubleTapTimer += Time.deltaTime;
+            if(doubleTapTimer > doubleTapTimeout)
+            {
+                doubleTapTimer = 0;
+                isDoubleTapTimerActivated = false;
+            }
+        }
+
+        isCanvasElementInteracted = false;
     }
 
     private void HandleTouchInput()
     {
+        if(!ignoreCanvasInteraction)
+        {
+            if(EventSystem.current.alreadySelecting)
+            {
+                Debug.Log("Already selecting");
+                return;
+            }
+        }
+
         if (Input.touchCount == 1)
         {
             Touch touch = Input.GetTouch(0);
@@ -132,6 +186,12 @@ public class InputManager : MonoBehaviour
             isDragging = false;
             dragTimer = 0;
         }
+
+        // Check if cursor is inside the application
+        isCursorInsideViewport = true;
+        Vector3 viewportPoint = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+        if (viewportPoint.x > 1 || viewportPoint.y > 1 || viewportPoint.x < 0 || viewportPoint.y < 0)
+            isCursorInsideViewport = false;      
     }
 
     private void HandleDrag(Vector2 pos)
@@ -160,6 +220,24 @@ public class InputManager : MonoBehaviour
     {
         //Debug.Log("Tap detected.");
         if (OnSingleTapEvent != null)
-            OnSingleTapEvent(pos); 
+            OnSingleTapEvent(pos);
+
+        if(isDoubleTapTimerActivated)
+        {
+            if(doubleTapTimer < doubleTapTimeout)
+            {
+                //Debug.Log("DoubleTap detected.");
+                if (OnDoubleTapEvent != null)
+                    OnDoubleTapEvent(pos);
+            }
+            
+            isDoubleTapTimerActivated = false;
+            doubleTapTimer = 0;
+        }
+        else
+        {
+            doubleTapTimer = 0;
+            isDoubleTapTimerActivated = true;
+        }
     }
 }

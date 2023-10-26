@@ -1,0 +1,4 @@
+List<DialogData> data = new List<DialogData>();
+data.Add(new DialogData(/speed:0/Hello! , RandomChar));
+data.Add(new DialogData(/speed:0/Hi! , Character2));
+dialogManager.Show(dialogTexts);

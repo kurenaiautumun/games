@@ -15,6 +15,8 @@ public class speechTestScript : MonoBehaviour
 
     private GameObject currentTalkingCharacter;
 
+    [SerializeField] private Dictionary<string, Sprite> speechBubbles = new Dictionary<string, Sprite>();
+
     void Start()
     {
         dialogManager = GameObject.Find("DialogAsset").GetComponent<DialogManager>();

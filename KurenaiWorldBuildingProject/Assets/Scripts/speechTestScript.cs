@@ -3,8 +3,49 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEditor;
+
+#region UNITYEDITOR
+
+[CustomEditor(typeof(speechTestScript))]
+public class speechTestEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        speechTestScript myTarget = (speechTestScript)target;
+
+        if (GUILayout.Button("Test Speech"))
+        {
+            myTarget.TestSpeech();
+        }
+    }
+}
+
+#endregion
 
 public class speechTestScript : MonoBehaviour
+{
+    // Remember to get a reference to the extended variant for speech bubbles
+    private ExtendedDialogManager dialogManager;
+    private void Start()
+    {
+        dialogManager = GameObject.Find("DialogAssetBubble Variant").GetComponent<ExtendedDialogManager>();
+    }
+
+    public void TestSpeech()
+    {
+        // Follows a similar structure to the normal dialog manager in order to be easy to learn and use
+        var dialogTexts = new List<DialogData>();
+        dialogTexts.Add(new DialogData("Hello! My name is\n/size:up//speed:down//color:red/ALICE/color:black//size:init//speed:init/", "Girl"));
+        dialogTexts.Add(new DialogData("Hello to you too!\n I'm a /size:120//color:green/COOK/color:black//size:init/", "Cook"));
+        dialogTexts.Add(new DialogData("Nice meeting you here.", "Girl"));
+        dialogTexts.Add(new DialogData("Same!", "Cook"));
+        dialogManager.Show(dialogTexts);
+    }
+}
+
+
+/*public class speechTestScript : MonoBehaviour
 {
     private DialogManager dialogManager;
     private GameObject printerObject, textObject;
@@ -135,3 +176,4 @@ public class speechTestScript : MonoBehaviour
         copyTo.localPosition = copyFrom.localPosition;
     }
 }
+*/

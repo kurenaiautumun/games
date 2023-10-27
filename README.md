@@ -15,6 +15,11 @@ Current update on project:
 - Sample Map
 ![TestMap](https://github.com/kurenaiautumun/games/blob/world-building/screenshots/testmap.png)
 
+- Bubble Dialog
+![BubbleDialog](https://github.com/kurenaiautumun/games/blob/world-building/screenshots/bubbledialog.png)
+Check the relevant scene and scripts for implementation
+
+
 ## Notes
 
 Project uses Unity 2022.3.3f1 with URP for 2D.

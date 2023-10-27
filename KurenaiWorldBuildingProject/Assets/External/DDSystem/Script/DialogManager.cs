@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// Please note that there are additions made to this script in order to extend it's capabilities
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -124,6 +126,7 @@ namespace Doublsb.Dialog
                 _current_Data.Callback = null;
             }
         }
+
         #endregion
 
         #region Selector
@@ -360,6 +363,9 @@ namespace Doublsb.Dialog
                 while (state != State.Wait) yield return null;
                 _currentDelay = Delay;
             }
+
+            if (OnPrintFinishedEvent != null)
+                OnPrintFinishedEvent();
         }
 
         public delegate void _printstartdelegate();

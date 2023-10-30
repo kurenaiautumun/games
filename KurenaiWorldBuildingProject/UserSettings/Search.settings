@@ -11,6 +11,9 @@ scopes = {
 	"last_search.D379D912" = ""
 	"OpenInspectorPreview.D379D912" = "0"
 	"currentGroup.D379D912" = "all"
+	"last_search.E8DA15E5" = ".png"
+	"OpenInspectorPreview.E8DA15E5" = "0"
+	"currentGroup.E8DA15E5" = "all"
 }
 providers = {
 	log = {
@@ -66,10 +69,9 @@ recentSearches = [
 searchItemFavorites = [
 ]
 savedSearchesSortOrder = 0
-showSavedSearchPanel = false
+showSavedSearchPanel = true
 hideTabs = false
-expandedQueries = [
-]
+expandedQueries = [-1765347274 961552606]
 queryBuilder = false
 ignoredProperties = "id;name;classname;imagecontentshash"
 helperWidgetCurrentArea = "all"

@@ -29,6 +29,7 @@ using System;
 using System.Text.RegularExpressions;
 using UnityEngine.Events;
 using System.Linq;
+using System.IO;
 
 namespace Doublsb.Dialog
 {
@@ -144,6 +145,23 @@ namespace Doublsb.Dialog
             this.isSkippable = isSkipable;
             this.Callback = callback;
             this.Character = character;
+        }
+
+        public static List<DialogData> Load(string dataPath)
+        {
+            if (!File.Exists(dataPath))
+                return null;
+
+            List<DialogData> data = new List<DialogData>();
+            using (StreamReader reader = new StreamReader(dataPath))
+            {
+                string character, dialog;
+                while ((character = reader.ReadLine()) != null && (dialog = reader.ReadLine()) != null)
+                {
+                    data.Add(new DialogData(dialog, character));
+                }
+            }
+            return data;
         }
 
         //================================================

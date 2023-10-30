@@ -4,19 +4,71 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
+using UnityEditor.PackageManager.UI;
+using static UnityEditor.Progress;
 
 #region UNITYEDITOR
 
 [CustomEditor(typeof(speechTestScript))]
 public class speechTestEditor : Editor
 {
+    string stringToEdit = "Edit here...";
+    string talkingCharacter = "";
+    string[] talkingCharacterOptions = null;
+    int selectedOption = 0;
+    string command = "";
+
     public override void OnInspectorGUI()
     {
+        base.OnInspectorGUI();
+        if(!EditorApplication.isPlaying)
+        {
+            GUILayout.Label("Run the game in the Editor's Play mode to start testing");
+            return;
+        }
         speechTestScript myTarget = (speechTestScript)target;
-
-        if (GUILayout.Button("Test Speech"))
+        /*if (GUILayout.Button("Test Speech"))
         {
             myTarget.TestSpeech();
+        }*/
+
+        talkingCharacterOptions = myTarget.GetCharacters();    
+
+        GUILayout.Space(20);
+        GUILayout.Label("Dialog Testing");
+
+        GUILayout.Space(10);
+        GUILayout.Label("Dialog:");
+        stringToEdit = GUILayout.TextArea(stringToEdit);
+
+        /*GUILayout.Space(10);
+        GUILayout.Label("Character:");
+        talkingCharacter = GUILayout.TextField(talkingCharacter);*/
+
+        if (talkingCharacterOptions != null)
+        {
+            selectedOption = EditorGUILayout.Popup("Dropdown", selectedOption, talkingCharacterOptions);
+            talkingCharacter = talkingCharacterOptions[selectedOption];
+        }
+
+        if (GUILayout.Button("Test Dialog"))
+        {
+            myTarget.TestDialog(stringToEdit, talkingCharacter);
+            command = "new DialogData(\"" + stringToEdit + "\", \"" + talkingCharacter + "\");";
+        }
+        GUIStyle fontStyle = new GUIStyle();
+        fontStyle.fontSize = 20;
+        fontStyle.font = EditorStyles.miniBoldFont;
+        fontStyle.normal.textColor = Color.white;
+
+        GUILayout.Space(10);
+        GUILayout.Label("Command:\n");
+        GUILayout.Label(command, fontStyle);
+        if (GUILayout.Button("Copy Command"))
+        {
+            GUIUtility.systemCopyBuffer = command;
+            if (command.Trim().Length == 0)  Debug.Log("Copied an empty string!");
+            else Debug.Log("Command successfully copied!");
         }
     }
 }
@@ -27,9 +79,12 @@ public class speechTestScript : MonoBehaviour
 {
     // Remember to get a reference to the extended variant for speech bubbles
     private ExtendedDialogManager dialogManager;
+    private GameObject charactersContainer;
+
     private void Start()
     {
         dialogManager = GameObject.Find("DialogAssetBubble Variant").GetComponent<ExtendedDialogManager>();
+        charactersContainer = dialogManager.gameObject.transform.Find("Characters").gameObject;
     }
 
     public void TestSpeech()
@@ -41,6 +96,34 @@ public class speechTestScript : MonoBehaviour
         dialogTexts.Add(new DialogData("Nice meeting you here.", "Girl"));
         dialogTexts.Add(new DialogData("Same!", "Cook"));
         dialogManager.Show(dialogTexts);
+    }
+
+    public void TestDialog(string dialog, string character)
+    {
+        if(character.Trim().Length == 0) {
+            Debug.Log("You can't have no characters for this dialog style! Randomly choosing one to display.");
+            character = charactersContainer.transform.GetChild(Random.Range(0,charactersContainer.transform.childCount)).name;
+        }
+        else if (charactersContainer.transform.Find(character) == null)
+        {
+            Debug.Log("You can't have an invalid character! Please check if the name is correct. Randomly choosing one to display.");
+            character = charactersContainer.transform.GetChild(Random.Range(0, charactersContainer.transform.childCount)).name;
+        }
+
+        dialog = dialog.Replace("\\n", "\n").Replace("\\t","\t").Replace("\\r", "\r");
+
+        dialogManager.Show(new DialogData(dialog, character));
+    }
+
+    public string[] GetCharacters()
+    {
+        if(charactersContainer == null || charactersContainer.transform.childCount == 0)
+            return null;
+
+        string[] talkingCharacterOptions = new string[charactersContainer.transform.childCount];
+        for(int i = 0; i < charactersContainer.transform.childCount; i++)
+            talkingCharacterOptions[i] = charactersContainer.transform.GetChild(i).name;
+        return talkingCharacterOptions;
     }
 }
 

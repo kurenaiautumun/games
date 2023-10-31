@@ -64,6 +64,7 @@ public class PauseMenuController : MonoBehaviour
         loadFileContainer.SetActive(true);
         pauseContainer.SetActive(false);
 
+        // Only get valid files
         string[] files = Directory.GetFiles(gameManagerController.baseSavePath, "*.json");
 
         for(int i = 0; i < files.Length; i++)

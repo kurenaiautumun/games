@@ -27,10 +27,11 @@ public class speechTestEditor : Editor
             return;
         }
         speechTestScript myTarget = (speechTestScript)target;
-        /*if (GUILayout.Button("Test Speech"))
+
+        if (GUILayout.Button("Start test conversation"))
         {
             myTarget.TestSpeech();
-        }*/
+        }
 
         talkingCharacterOptions = myTarget.GetCharacters();    
 

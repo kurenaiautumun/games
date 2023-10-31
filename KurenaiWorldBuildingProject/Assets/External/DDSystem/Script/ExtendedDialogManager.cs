@@ -93,6 +93,7 @@ public class ExtendedDialogManager : MonoBehaviour
     //Public Methods
     //================================================
 
+    // We only need to hook the correct functions to enable the printer to correctly display the bubbles
     public void Show(DialogData Data)
     {
         dialogManager.OnPrintStartEvent += SwitchCurrentActiveTalkingCharacter;
@@ -115,6 +116,7 @@ public class ExtendedDialogManager : MonoBehaviour
 
     public bool IsInitialized() { return isInitialized; }
 
+    // Call this if for some reason dialogManager is null (or isInitialized is false)
     public void Initialize()
     {
         dialogManager = GetComponent<DialogManager>();
@@ -164,8 +166,8 @@ public class ExtendedDialogManager : MonoBehaviour
         // If flip is enabled, then bubble speech will flip accordingly (make sure the image is proper)
         if (flipBubbleWithCharacter)
         {
-            var pls = printerObject.transform.localScale;
-            var tls = textObject.transform.localScale;
+            // We need to invert the printer's scale to mirror the bubble
+            // We also need to invert the text's scale and adjust the pivot to display the text correctly
             if (currentTalkingCharacter.GetComponent<SpriteRenderer>().flipX)
             {
                 printerObject.transform.localScale = new Vector3(-1, 1, 1);
@@ -188,6 +190,7 @@ public class ExtendedDialogManager : MonoBehaviour
         ResizePrinter();
     }
 
+    // If the size is not right, adjust it here (also check the printer object for the alignment)
     private void ResizePrinter()
     {
         var finalSize = textRectTransform.sizeDelta + new Vector2(80, 50);

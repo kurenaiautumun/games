@@ -66,11 +66,10 @@ public class InputManager : MonoBehaviour
     {
         if(!ignoreCanvasInteraction)
         {
-            // Check if UI is being interacted
+            // Check if UI is being interacted, then ignore the rest as EventSystem handles UI interactions
             if (EventSystem.current.currentSelectedGameObject != null)
             {
                 isCanvasElementInteracted = true;
-                //Debug.Log("UI element is being interacted with: " + EventSystem.current.currentSelectedGameObject.name);
                 return;
             }
         }
@@ -93,6 +92,7 @@ public class InputManager : MonoBehaviour
 
     private void HandleTouchInput()
     {
+        // No need to process further  if the EventSystem is still active
         if(!ignoreCanvasInteraction)
         {
             if(EventSystem.current.alreadySelecting)
@@ -102,21 +102,26 @@ public class InputManager : MonoBehaviour
             }
         }
 
+        // Single/Double tap and drag are single touch events here
         if (Input.touchCount == 1)
         {
             Touch touch = Input.GetTouch(0);
 
+            // Set values at the start
             if (touch.phase == TouchPhase.Began)
             {
                 startPosition = touch.position;
                 dragTimer = 0;
             }
+            
+            // If we moved then we check if it is a valid drag action
             else if(touch.phase == TouchPhase.Moved)
             {
                 dragTimer += Time.deltaTime;
                 HandleDrag(touch.position);
             }
 
+            // If we finish, then we check if single/double tap if it is not drag action
             else if (touch.phase == TouchPhase.Ended)
             {
                 if (!isDragging)
@@ -131,6 +136,7 @@ public class InputManager : MonoBehaviour
             }
         }
 
+        // Pinch action requires 2 touches (might require further adjustments)
         if (Input.touchCount == 2)
         {
             if(isDragging)
@@ -158,22 +164,36 @@ public class InputManager : MonoBehaviour
 
     private void HandleMouseInput()
     {
+        // No need to process further  if the EventSystem is still active
+        if (!ignoreCanvasInteraction)
+        {
+            if (EventSystem.current.alreadySelecting)
+            {
+                Debug.Log("Already selecting");
+                return;
+            }
+        }
+
+        // Get the value for scrolling event
         float scroll = Input.mouseScrollDelta.y;
         if (scroll != 0 && ScrollEvent != null)
             ScrollEvent(scroll);
 
+        // We just clicked the mouse so set the values
         if (Input.GetMouseButtonDown(0))
         {
             startPosition = Input.mousePosition;
             dragTimer = 0;
         }
 
+        // If we are still holding down the mouse button then check for drag action
         else if (Input.GetMouseButton(0))
         {
             dragTimer += Time.deltaTime;
             HandleDrag(Input.mousePosition);                   
         }
 
+        // If we release the button then check for single/double tap if it is not drag action
         else if(Input.GetMouseButtonUp(0))
         {
             if (!isDragging)
@@ -187,18 +207,20 @@ public class InputManager : MonoBehaviour
             dragTimer = 0;
         }
 
-        // Check if cursor is inside the application
+        // Check if cursor is inside the application (Currently not used)
         isCursorInsideViewport = true;
         Vector3 viewportPoint = Camera.main.ScreenToViewportPoint(Input.mousePosition);
         if (viewportPoint.x > 1 || viewportPoint.y > 1 || viewportPoint.x < 0 || viewportPoint.y < 0)
             isCursorInsideViewport = false;      
     }
 
+    // Check for drag action
     private void HandleDrag(Vector2 pos)
     {
         float distance = Vector2.Distance(startPosition, pos);
         float velocity = distance / dragTimer;
 
+        // Determine if drag based on threshold
         if (dragTimer > timeThreshold || distance > distanceThreshold || velocity > velocityThreshold)
         {
             if(!isDragging)
@@ -208,7 +230,7 @@ public class InputManager : MonoBehaviour
                 isDragging = true;
             }
 
-            //Debug.Log("Drag detected.");
+            // We send the change in the positions (Might need to adjust this further)
             Vector2 delta = pos - startPosition;
             if (OnDragEvent != null)
                 OnDragEvent(delta);
@@ -216,9 +238,9 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    // Check if single or double tap
     private void HandleTap(Vector2 pos)
     {
-        //Debug.Log("Tap detected.");
         if (OnSingleTapEvent != null)
             OnSingleTapEvent(pos);
 
@@ -226,7 +248,6 @@ public class InputManager : MonoBehaviour
         {
             if(doubleTapTimer < doubleTapTimeout)
             {
-                //Debug.Log("DoubleTap detected.");
                 if (OnDoubleTapEvent != null)
                     OnDoubleTapEvent(pos);
             }

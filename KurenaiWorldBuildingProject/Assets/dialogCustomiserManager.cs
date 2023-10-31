@@ -18,8 +18,10 @@ public class dialogCustomiserEditor : Editor
 
         stringToEdit = GUILayout.TextArea(stringToEdit);
 
+        // Test the dialog
         if (GUILayout.Button("Test Dialog"))
         {
+            // Note: we only need the Show() method to display our dialogs!
             myTarget.StartPreviewDialogMode();
             myTarget.Show(stringToEdit);
         }
@@ -96,6 +98,7 @@ public class dialogCustomiserManager : MonoBehaviour
 
     public void Save(string savePath)
     {
+        // Save the data 3 lines at a time into the file
         using (StreamWriter writer = new StreamWriter(savePath))
         {
             for(int i = 0; i < dialogs.Count; i++)
@@ -109,14 +112,15 @@ public class dialogCustomiserManager : MonoBehaviour
 
     public void Load(string loadPath)
     {
+        // We need to clear everything first
         talkingCharacters.Clear();
         bubbleIndices.Clear();
         dialogs.Clear();
 
+        // Now we read the data from the file 3 lines at a time (1st line for the character, 2nd line for the actual dialog, 3rd line for the type of bubble)
         using (StreamReader reader = new StreamReader(loadPath))
         {
             string character, dialog, speech;
-            int i = 0;
             while ((character = reader.ReadLine()) != null && (dialog = reader.ReadLine()) != null && (speech = reader.ReadLine()) != null)
             {
                 talkingCharacters.Add(character);
@@ -126,8 +130,10 @@ public class dialogCustomiserManager : MonoBehaviour
         }
     }
 
+    // This Show() has some extra functionalities added to it to enable the dialogs to be displayed from file as well as handle the different bubbles
     public void Show(string filename = null)
     {
+        // If we want to load dialogs from file
         if (filename != null)
         {
             var p = Path.Combine(dataPath, filename);
@@ -142,21 +148,26 @@ public class dialogCustomiserManager : MonoBehaviour
             }
         }
 
+        // Reset the index so it starts from the beginning
         currentIndex = 0;
 
+        // Hook the functions
         dialogManager.OnPrintFinishedEvent += SwitchBubble;
         dialogManager.OnDialogEndedEvent += ResetDialog;
 
+        // Add the dialogs from the list
         List < DialogData> dialogdata = new List < DialogData>();
         for(int i = 0;i < dialogs.Count;i++)
         {
             dialogdata.Add(new DialogData(dialogs[i], talkingCharacters[i]));
         }
 
+        // Put the correct bubble at the start and we can start showing the dialogs by using the extended manager (as it nicely handles the character switching and bubble resizing)
         edmprinterObject.GetComponent<Image>().sprite = speechBubbleImageList[bubbleIndices[currentIndex]];
         extendedDialogManager.Show(dialogdata);
     }
 
+    // If we are previewing, then we would want the creator UI to not show up
     public void StartPreviewDialogMode()
     {
         if(isDialogCreatorMode)
@@ -165,6 +176,7 @@ public class dialogCustomiserManager : MonoBehaviour
             extendedDialogManager.gameObject.SetActive(true);
         }
         
+        // We just do a check first if the correct characters are already added else we will add them
         GameObject characterPrefab = AssetDatabase.LoadAssetAtPath("Assets/External/DDSystem/Prefab/BindedCharacter.prefab", typeof(GameObject)) as GameObject;
         var edmcharcontainer = extendedDialogManager.gameObject.transform.Find("Characters");
         for(int i = 0; i < charactersContainer.transform.childCount;i++)
@@ -178,9 +190,11 @@ public class dialogCustomiserManager : MonoBehaviour
             }
         }
 
+        // We want to show the creator UI again if we are in creator mode
         dialogManager.OnDialogEndedEvent += EndPreviewDialogMode;
     }
 
+    // If we are in creator mode then we want the UI to be enabled again (and the extended manager object to be disabled)
     public void EndPreviewDialogMode()
     {
         if(isDialogCreatorMode)
@@ -192,6 +206,7 @@ public class dialogCustomiserManager : MonoBehaviour
         dialogManager.OnDialogEndedEvent -= EndPreviewDialogMode;
     }
 
+    // Change the bubble's image
     private void SwitchBubble()
     {
         currentIndex += 1;
@@ -199,6 +214,7 @@ public class dialogCustomiserManager : MonoBehaviour
             edmprinterObject.GetComponent<Image>().sprite = speechBubbleImageList[bubbleIndices[currentIndex]];
     }
 
+    // When we are done then we need to unhook and reset some values
     private void ResetDialog()
     {
         currentIndex = 0;
@@ -206,24 +222,32 @@ public class dialogCustomiserManager : MonoBehaviour
         dialogManager.OnDialogEndedEvent -= ResetDialog;
     }
 
+    ////////////////////////////////
+    /// Creator Mode Section
+    ////////////////////////////////
+
+    // This is here for the Creator UI's printer and not the extended manager
     private void ResizePrinter()
     {
         var finalSize = textRectTransform.sizeDelta + new Vector2(80, 50);
         printerRectTransform.sizeDelta = finalSize;
     }
 
+    // Based on the current dialog we are editing, we set the correct values into the UI elements
     private void SetCurrentIndex()
     {
+        // To prevent the user from being unable to edit the input field when it is empty we put in some default text
         textObject.GetComponent<InputField>().text = dialogs[currentIndex].Trim().Length > 0? dialogs[currentIndex] : "Edit here...";
         printerObject.GetComponent<Image>().sprite = speechBubbleImageList[bubbleIndices[currentIndex]];
         characterBtn.GetComponentInChildren<TMP_Text>().text = talkingCharacters[currentIndex];
         ResizePrinter();
 
+        // We want to relocate the bubble to the correct character
         var c = charactersContainer.transform.Find(talkingCharacters[currentIndex]).gameObject;
         SetCurrentTalkingCharacter(c);
     }
 
-
+    // Handles the bubble's location based on the current character that is speaking (similar to the one in extended manager)
     private void SetCurrentTalkingCharacter(GameObject c)
     {
         if (c == null)
@@ -241,7 +265,7 @@ public class dialogCustomiserManager : MonoBehaviour
             var bubbleScreenPos = Camera.main.WorldToScreenPoint(characterPos);
             printerObject.transform.position = bubbleScreenPos;
 
-            // If flip is enabled, then bubble speech will flip accordingly (make sure the image is proper)
+            // If flip is enabled, then bubble speech will flip accordingly (make sure the image is proper) [We enable this by default for the creator mode]
             if (true)
             {
                 var pls = printerObject.transform.localScale;
@@ -262,6 +286,7 @@ public class dialogCustomiserManager : MonoBehaviour
         }
     }
 
+    // We need these functions to properly convert the strings for storage and displaying
     private string ConvertMultilineDialogIntoSingleLine(string s)
     {
         return s.Replace("\n", "\\n").Replace("\t", "\\t").Replace("\r", "\\r");

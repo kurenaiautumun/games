@@ -50,6 +50,7 @@ public class MapManagerController : MonoBehaviour
 
         CreateMapMarkers();
 
+        // Hook the functions to the correct events
         InputManager.ScrollEvent += ZoomCamera;
         InputManager.PinchEvent += ZoomCamera;
         InputManager.OnDragEvent += MoveCamera;
@@ -61,6 +62,7 @@ public class MapManagerController : MonoBehaviour
 
     private void OnDestroy()
     {
+        // Unhook them because we don't need them anymore if this script does not exist
         InputManager.ScrollEvent -= ZoomCamera;
         InputManager.PinchEvent -= ZoomCamera;
         InputManager.OnDragEvent -= MoveCamera;
@@ -74,13 +76,14 @@ public class MapManagerController : MonoBehaviour
 
     void Update()
     {
+        // If a region is selected then we animate it's outline
         if(currentSelectedRegion != null )
         {
             HighlightSelectedRegion();
         }
     }
 
-    
+    // Handles the pulsing animation of the boundary
     private void HighlightSelectedRegion()
     {
         outlineTimer += Time.deltaTime;
@@ -89,13 +92,17 @@ public class MapManagerController : MonoBehaviour
         currentSelectedRegionSpriteRenderer.material.SetFloat("_Distance", thickness);
     }
 
+    // If we do a single tap then we check if we selected anything
     private void HandleSelection(Vector2 pos)
     {
+        // Using colliders we check if the point we tapped on also coincides with some object
         var touchWorldPos = Camera.main.ScreenToWorldPoint(pos);
         Collider2D collider = Physics2D.OverlapPoint(touchWorldPos);
 
+        // No collider so no object was detected
         if(collider == null)
         {
+            // Deselect any selected region
             if (currentSelectedRegion != null)
             {
                 currentSelectedRegionSpriteRenderer.material = spriteMat;
@@ -103,23 +110,29 @@ public class MapManagerController : MonoBehaviour
             }
         }
 
+        // Found an object with a collider
         else
         {
+            // If we had selected the same region then we do not need to do anything else currently
             if (currentSelectedRegion == collider.gameObject)
                 return;
 
+            // A different region so we reset the material of the previously selected region
             if(currentSelectedRegion != null)
                 currentSelectedRegionSpriteRenderer.material = spriteMat;
 
+            // Now we apply the changes to the new region
             currentSelectedRegionSpriteRenderer = collider.gameObject.GetComponent<SpriteRenderer>();
             currentSelectedRegionSpriteRenderer.material = outlineMat;
             currentSelectedRegion = collider.gameObject;
             outlineTimer = 0;
 
+            // If we selected a map marker then we should handle accordingly
             //SelectMapMarker(collider.gameObject);
         }
     }
 
+    // Unused (InputManager handles this now)
     private void HandleTouchInput()
     {
         if (Input.touchCount == 1)
@@ -190,6 +203,7 @@ public class MapManagerController : MonoBehaviour
         }
     }
 
+    // Unused (InputManager handles this now)
     private void HandleMouseKeyboardInput()
     {
         if (Input.GetMouseButtonDown(0))
@@ -240,6 +254,7 @@ public class MapManagerController : MonoBehaviour
         ZoomCamera(scroll);
     }
 
+    // Handles the zooming functionality (value is provided by InputManager)
     private void ZoomCamera(float deltaValue)
     {
         if (deltaValue < 0)
@@ -254,6 +269,7 @@ public class MapManagerController : MonoBehaviour
         }
     }
 
+    // Handles the camera movement functionality (value is provided by InputManager)
     private void MoveCamera(Vector2 displacement)
     {
         Vector3 camPos = Camera.main.transform.position;
@@ -262,6 +278,7 @@ public class MapManagerController : MonoBehaviour
         Camera.main.transform.position = camPos;
     }
 
+    // Dynamically create map markers (Only used for demonstration purposes right now)
     private void CreateMapMarkers()
     {
         if(mapMarkerHierarchy != null)
@@ -290,6 +307,7 @@ public class MapManagerController : MonoBehaviour
         }
     }
  
+    // If we selected a map marker, then we should display some information
     private void SelectMapMarker(GameObject mapMarker)
     {
         // Show the text

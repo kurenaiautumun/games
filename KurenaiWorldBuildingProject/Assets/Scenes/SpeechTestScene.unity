@@ -207,6 +207,17 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &124396046 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -517850468094483802, guid: 1beaaeab63dc7ec4b88df413027811b0, type: 3}
+  m_PrefabInstance: {fileID: 1190916548}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e612dd5a621c1764390c2ca1806a4785, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &305409396
 GameObject:
   m_ObjectHideFlags: 0
@@ -715,6 +726,59 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9023853735729445802, guid: 1beaaeab63dc7ec4b88df413027811b0, type: 3}
   m_PrefabInstance: {fileID: 1190916548}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1554561543
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1554561545}
+  - component: {fileID: 1554561544}
+  m_Layer: 0
+  m_Name: DialogCustomiserManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1554561544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1554561543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00143d87644fd254fa77b9552ad207ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speechBubbleImageList:
+  - {fileID: 21300000, guid: dce75cd3ac631e44f9546f0502b08044, type: 3}
+  - {fileID: 21300000, guid: 2c0373f4799f6774b851b0397518a725, type: 3}
+  - {fileID: 21300000, guid: 9be6ca8208c4ba44d9ffa3ea87a6af33, type: 3}
+  - {fileID: 21300000, guid: 2a64bf372b67e804d93442b4364386d3, type: 3}
+  charactersContainer: {fileID: 981938775}
+  canvas: {fileID: 0}
+  isDialogCreatorMode: 0
+  extendedDialogManager: {fileID: 124396046}
+--- !u!4 &1554561545
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1554561543}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1580557325
 GameObject:
   m_ObjectHideFlags: 0
@@ -726,7 +790,7 @@ GameObject:
   - component: {fileID: 1580557327}
   - component: {fileID: 1580557326}
   m_Layer: 0
-  m_Name: SpeechTestManager
+  m_Name: DialogCreatorManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -293,9 +293,11 @@ public class GameManagerController : MonoBehaviour
 
     }
 
+    // Select a valid object in side view mode
     private void SelectSideViewObject(Vector2 touchWorldPos)
     {
         GameObject selectedObject = null;
+        // Check the cross grids first
         for(int i=0;i< crossGridObjectsHierarchy[topViewActiveGrid].transform.childCount;i++)
         {
             var child = crossGridObjectsHierarchy[topViewActiveGrid].transform.GetChild(i);
@@ -312,6 +314,7 @@ public class GameManagerController : MonoBehaviour
             break;
         }
 
+        // If we didn't find then check the normal subgrids
         if(selectedObject == null)
         {
             for (int i = 0; i < topDownSubGrids.Length; i++)
@@ -338,6 +341,7 @@ public class GameManagerController : MonoBehaviour
             }
         }
 
+        // If we find then highlight it and send a message
         if (selectedObject!= null)
         {
             selectedObject.GetComponent<SpriteRenderer>().color = Color.black;

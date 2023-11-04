@@ -119,7 +119,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 19
+  controlID: 92
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 20
+  controlID: 45
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -169,7 +169,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 50}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 21
+  controlID: 46
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -234,7 +234,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ConsoleWindow
+  m_Name: ProjectBrowser
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -243,15 +243,15 @@ MonoBehaviour:
     y: 875
     width: 1762
     height: 424
-  m_MinSize: {x: 101, y: 121}
-  m_MaxSize: {x: 4001, y: 4021}
-  m_ActualView: {fileID: 17}
+  m_MinSize: {x: 231, y: 271}
+  m_MaxSize: {x: 10001, y: 10021}
+  m_ActualView: {fileID: 16}
   m_Panes:
   - {fileID: 16}
   - {fileID: 17}
   - {fileID: 18}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -414,9 +414,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 3e760000
-      m_LastClickedID: 30270
-      m_ExpandedIDs: 6af8ffff0efbffff
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: a207ffffee07ffff4619ffff5e19ffff7219ffffb019ffff9c32ffffb432ffffc832ffff0633ffff3644ffff4e44ffff6244ffffa044ffff5c60ffff7060ffffae60ffff7278ffff8678ffff54bdffffc0faffff04fbffff0efbffff3c7100004e710000f0710000567200008672000070730000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -848,9 +848,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -0.8109305, y: 0.11408036, z: 11.993537}
+    m_Target: {x: -2.4824247, y: -3.0137258, z: -0.049253233}
     speed: 2
-    m_Value: {x: -0.8109305, y: 0.11408036, z: 11.993537}
+    m_Value: {x: -2.4824247, y: -3.0137258, z: -0.049253233}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -900,9 +900,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 7.455097
+    m_Target: 5.58656
     speed: 2
-    m_Value: 7.455097
+    m_Value: 5.58656
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -947,10 +947,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 489
+    x: 414
     y: 73
-    width: 1516
-    height: 823
+    width: 1346
+    height: 854
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1042,7 +1042,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts
+    - Assets/External/DDSystem/Prefab
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -1050,16 +1050,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scripts
+  - Assets/External/DDSystem/Prefab
   m_LastFoldersGridSize: -1
   m_LastProjectPath: D:\WinterCrestal\GitHub\KurenaiGames\KurenaiWorldBuildingProject
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 65}
-    m_SelectedIDs: 18750000
-    m_LastClickedID: 29976
-    m_ExpandedIDs: 00000000d4740000d6740000d8740000da740000dc740000de740000e0740000e2740000e4740000e6740000e8740000ea740000ec740000ee74000000ca9a3bffffff7f
+    m_SelectedIDs: 42cb0000
+    m_LastClickedID: 52034
+    m_ExpandedIDs: 000000000477000006770000087700000a7700000c7700000e77000010770000127700001477000016770000187700001a7700001c7700001e770000b28d000034cb000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1087,7 +1087,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000d4740000d6740000d8740000da740000dc740000de740000e0740000e2740000e4740000e6740000e8740000ea740000ec740000ee740000
+    m_ExpandedIDs: 000000000477000006770000087700000a7700000c7700000e77000010770000127700001477000016770000187700001a7700001c7700001e770000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1112,8 +1112,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 3e760000
-    m_LastClickedInstanceID: 30270
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c62300006641000000710000e87e00002ed20000c634fdff000000009af000000e9500001cb00000480200006c7400003e7f000080740000e67800002c720000
     m_RenameOverlay:
@@ -1213,7 +1213,7 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 30270
+  m_LastSelectedObjectID: -63506
 --- !u!114 &19
 MonoBehaviour:
   m_ObjectHideFlags: 52

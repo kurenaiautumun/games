@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Color = UnityEngine.Color;
 using Doublsb.Dialog;
+using UnityEditor;
 
 public enum GridInteractionMode {Select, Place, Clear };
 
@@ -25,10 +26,19 @@ public class LoadableObjects
 };
 
 [Serializable]
+public class CharacterObjects
+{
+    public string name;
+    public int gridPosX, gridPosY;
+    public CharacterObjects(string s, int x, int y) {  name = s; gridPosX = x;gridPosY = y; }
+}
+
+[Serializable]
 public class GridData
 {
     public int gridCountX, gridCountY, gridSizeX, gridSizeY;
     public List<LoadableObjects> objects = new List<LoadableObjects>();
+    public List<CharacterObjects> characterObjects = new List<CharacterObjects>();
 }
 
 [Serializable]
@@ -104,6 +114,9 @@ public class GameManagerController : MonoBehaviour
     [Header("Misc Section")]
     public CameraController cameraController;
     private DialogManager dialogManager;
+    private ExtendedDialogManager extendedDialogManager;
+    //We are using the bubble type manager for characters, so load/save is done through the bubble variant
+    //The RPG variant is only used for displaying info when we select an object in side view
 
     private Vector2 previousTouchLocation;
     private bool hasInputTouchDragged;
@@ -124,7 +137,8 @@ public class GameManagerController : MonoBehaviour
         }
 
         dialogManager = GameObject.Find("DialogAsset").GetComponent<DialogManager>();
-        
+        extendedDialogManager = GameObject.Find("DialogAssetBubble Variant").GetComponent<ExtendedDialogManager>();
+
         previousTouchLocation = new Vector3(Screen.width / 2, Screen.height / 2, 0);
 
         CreateEmptyMap();
@@ -493,6 +507,22 @@ public class GameManagerController : MonoBehaviour
             {
                 Destroy(sideViewMarkers[x + pos.x]);
                 sideViewMarkers[x + pos.x] = null; 
+            }
+        }
+
+        if (component.type == objectType.Character)
+        {
+            var characterContainer = extendedDialogManager.transform.Find("Characters");
+            GameObject characterPrefab = AssetDatabase.LoadAssetAtPath("Assets/External/DDSystem/Prefab/BindedCharacter.prefab", typeof(GameObject)) as GameObject;
+            var go = Instantiate(characterPrefab, characterContainer);
+            go.name = item.name;
+            go.GetComponent<inGameCharacterBinderScript>().inGameCharacterRef = sideObject;
+            sideObject.GetComponent<GridObject>().altViewObject = gridObject;
+            sideObject.GetComponent<GridObject>().id = itemID;
+
+            if(characterPrefab.name == go.name)
+            {
+                Debug.Log("Remember to rename character in editor before saveing: " + go.name);
             }
         }
     }
@@ -1049,6 +1079,14 @@ public class GameManagerController : MonoBehaviour
             crossGridObjectsHierarchy[i].SetActive(false);
         }
 
+        var characterContainer = extendedDialogManager.transform.Find("Characters");
+        for (int idx = characterContainer.childCount - 1; idx >= 0 ; idx--)
+        {
+            if (characterContainer.GetChild(idx).GetComponent<inGameCharacterBinderScript>() == null)
+                continue;
+            Destroy(characterContainer.GetChild(idx).gameObject);
+        }
+
         sideViewCrossGridObjects = new GameObject[gridsPerMapCount, playingFieldGridCount.x - 1, playingFields[0].size.y];
         sideViewMarkers = new GameObject[playingFields[topViewActiveGrid].size.x];
 
@@ -1073,8 +1111,10 @@ public class GameManagerController : MonoBehaviour
         mapData.name = fileName;
         mapData.gridCount = gridsPerMapCount;
 
+        var characterContainer = extendedDialogManager.transform.Find("Characters");
+
         // Loop through each grid in the map and get the data for each object
-        for(int i=0;i<gridsPerMapCount;i++)
+        for (int i=0;i<gridsPerMapCount;i++)
         {
             GridData gridData = new GridData();
             gridData.gridCountX = playingFieldGridCount.x;
@@ -1098,6 +1138,24 @@ public class GameManagerController : MonoBehaviour
 
                         LoadableObjects saveObject = new LoadableObjects(component.id, pos);
                         gridData.objects.Add(saveObject);
+
+                        if(component.type == objectType.Character)
+                        {
+                            for (int idx = 0; idx < characterContainer.childCount; idx++)
+                            {
+                                var binder = characterContainer.GetChild(idx).GetComponent<inGameCharacterBinderScript>();
+                                if (binder == null)
+                                    continue;
+                                var gridCharacter = binder.inGameCharacterRef.GetComponent<GridObject>().altViewObject;
+                                if (gridCharacter == item)
+                                {
+                                    CharacterObjects c = new CharacterObjects(characterContainer.GetChild(idx).name, pos.x, pos.y);
+                                    gridData.characterObjects.Add(c);
+                                    break;
+                                }
+                            }
+                        }
+
                     }
                 }
             }
@@ -1132,6 +1190,8 @@ public class GameManagerController : MonoBehaviour
         string mapPath = Path.Combine(baseSavePath, mapFile);
         string jsonString = File.ReadAllText(mapPath);
         var mapData = JsonUtility.FromJson<MapData>(jsonString);
+        var characterContainer = extendedDialogManager.transform.Find("Characters");
+        var dropdown = itemPickerDropdownContainer.GetComponent<TMP_Dropdown>();
 
         gridsPerMapCount = mapData.gridCount;
         playingFieldGridCount = new Vector2Int(mapData.grids[0].gridCountX, mapData.grids[0].gridCountY);
@@ -1149,15 +1209,36 @@ public class GameManagerController : MonoBehaviour
                 Vector3 gridPos = new Vector3(item.gridPosX + playingFieldOrigin.x, item.gridPosY + playingFieldOrigin.y);
                 GameObject prefab = itemPickerDropdownContainer.GetComponent<ItemPickerController>().GetItem(item.id);
                 if (prefab != null)
+                {
+                    dropdown.value = item.id;
                     PlaceObjectInWorld(gridPos, prefab);
+                }           
                 else
                     Debug.LogError("Item Type is invalid!");
             }
-            
-        }    
+            foreach(var item in grid.characterObjects)
+            {
+                Vector3 gridPos = new Vector3(item.gridPosX + playingFieldOrigin.x, item.gridPosY + playingFieldOrigin.y);
+                for(int i = 0; i<characterContainer.childCount; i++)
+                {
+                    var child = characterContainer.GetChild(i);
+                    var binder = child.GetComponent<inGameCharacterBinderScript>();
+                    if(binder != null)
+                    {
+                        var gridCharacter = binder.inGameCharacterRef.GetComponent<GridObject>().altViewObject;
+                        var charPos = gridCharacter.GetComponent<GridObject>().gridPosition;
+                        if(charPos.x == gridPos.x && charPos.y == gridPos.y)
+                        {
+                            child.name = item.name;
+                        }
+                    }
+                }
+            }
+        }
 
         sideViewActiveGrid = 0;
         topViewActiveGrid = 0;
+        dropdown.value = 0;
         topDownMode.SetActive(true);
 
         topDownObjectsHierarchy[0].SetActive(true);

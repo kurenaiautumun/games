@@ -97,6 +97,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b9d076ab7872f946b4f29127a707ca8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 2
   gridPosition: {x: 0, y: 0}
   size: {x: 1, y: 1}
+  scale: 1
+  altViewObject: {fileID: 0}
+  id: -1
+  type: 1

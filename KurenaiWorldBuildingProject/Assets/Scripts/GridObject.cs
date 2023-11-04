@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //Using a dictionary would be better if adding more types dynamically
-public enum objectType { None, House, Tree };
+public enum objectType { None, Prop, Character }; 
 
 public class GridObject : MonoBehaviour
 {
@@ -13,6 +13,7 @@ public class GridObject : MonoBehaviour
     public float scale = 1f;
     public GameObject altViewObject = null;
     public int id = -1;
+    public objectType type = objectType.None;
 
     public string GetName()
     {

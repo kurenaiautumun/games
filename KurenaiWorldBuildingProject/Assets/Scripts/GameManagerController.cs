@@ -115,6 +115,7 @@ public class GameManagerController : MonoBehaviour
     public CameraController cameraController;
     private DialogManager dialogManager;
     private ExtendedDialogManager extendedDialogManager;
+    private dialogCustomiserManager dialogCustomiserManager;
     //We are using the bubble type manager for characters, so load/save is done through the bubble variant
     //The RPG variant is only used for displaying info when we select an object in side view
 
@@ -138,6 +139,7 @@ public class GameManagerController : MonoBehaviour
 
         dialogManager = GameObject.Find("DialogAsset").GetComponent<DialogManager>();
         extendedDialogManager = GameObject.Find("DialogAssetBubble Variant").GetComponent<ExtendedDialogManager>();
+        dialogCustomiserManager = extendedDialogManager.GetComponent<dialogCustomiserManager>();
 
         previousTouchLocation = new Vector3(Screen.width / 2, Screen.height / 2, 0);
 
@@ -519,10 +521,11 @@ public class GameManagerController : MonoBehaviour
             go.GetComponent<inGameCharacterBinderScript>().inGameCharacterRef = sideObject;
             sideObject.GetComponent<GridObject>().altViewObject = gridObject;
             sideObject.GetComponent<GridObject>().id = itemID;
+            dialogCustomiserManager.loadedCharacters.Add(sideObject);
 
             if(characterPrefab.name == go.name)
             {
-                Debug.Log("Remember to rename character in editor before saveing: " + go.name);
+                Debug.Log("Remember to rename character in editor before saveing: " + go.name+"\nAlso, please reload the map to ensure the dialog manager properly renames and link the characters");
             }
         }
     }
@@ -1101,6 +1104,8 @@ public class GameManagerController : MonoBehaviour
         topViewActiveGrid = 0;
 
         sideViewXGapBetweenObjects = 1.0f / playingFieldSubGridSize.x;
+
+        dialogCustomiserManager.loadedCharacters = new List<GameObject>();
     }
 
     public void SaveCurrentMap(string fileName)
@@ -1230,6 +1235,8 @@ public class GameManagerController : MonoBehaviour
                         if(charPos.x == gridPos.x && charPos.y == gridPos.y)
                         {
                             child.name = item.name;
+                            gridCharacter.name = item.name;
+                            binder.inGameCharacterRef.name = item.name;
                         }
                     }
                 }

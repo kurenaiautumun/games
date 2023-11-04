@@ -34,6 +34,7 @@ public class dialogCustomiserManager : MonoBehaviour
     public GameObject charactersContainer;
     public Canvas canvas;
     public bool isDialogCreatorMode;
+    public List<GameObject> loadedCharacters;
 
     public ExtendedDialogManager extendedDialogManager;
     private DialogManager dialogManager;
@@ -61,6 +62,7 @@ public class dialogCustomiserManager : MonoBehaviour
 
         dialogManager = extendedDialogManager.gameObject.GetComponent<DialogManager>();
         edmprinterObject = extendedDialogManager.gameObject.transform.GetChild(0).gameObject;
+        loadedCharacters = new List<GameObject> ();
 
         if (isDialogCreatorMode)
         {
@@ -93,7 +95,15 @@ public class dialogCustomiserManager : MonoBehaviour
             }
             extendedDialogManager.gameObject.SetActive(true);
             edmprinterObject.gameObject.SetActive(false);
-        }   
+        }
+
+        if(charactersContainer != null)
+        {
+            for(int i=0;i<charactersContainer.transform.childCount;i++)
+            {
+                loadedCharacters.Add(charactersContainer.transform.GetChild(i).gameObject);
+            }
+        }
     }
 
     public void Save(string savePath)
@@ -243,8 +253,18 @@ public class dialogCustomiserManager : MonoBehaviour
         ResizePrinter();
 
         // We want to relocate the bubble to the correct character
-        var c = charactersContainer.transform.Find(talkingCharacters[currentIndex]).gameObject;
-        SetCurrentTalkingCharacter(c);
+        //var c = charactersContainer.transform.Find(talkingCharacters[currentIndex]).gameObject;
+        GameObject c = null;
+        for(int i = 0; i < loadedCharacters.Count; i++)
+        {
+            if (loadedCharacters[i].name == talkingCharacters[currentIndex])
+            {
+                c = loadedCharacters[i];
+                break;
+            }
+        }
+        if(c != null)
+            SetCurrentTalkingCharacter(c);
     }
 
     // Handles the bubble's location based on the current character that is speaking (similar to the one in extended manager)

@@ -7045,8 +7045,48 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9023853736538869814, guid: 1beaaeab63dc7ec4b88df413027811b0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1614033499}
   m_SourcePrefab: {fileID: 100100000, guid: 1beaaeab63dc7ec4b88df413027811b0, type: 3}
+--- !u!1 &1614033498 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9023853736538869814, guid: 1beaaeab63dc7ec4b88df413027811b0, type: 3}
+  m_PrefabInstance: {fileID: 1614033497}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1614033499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614033498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00143d87644fd254fa77b9552ad207ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speechBubbleImageList:
+  - {fileID: 21300000, guid: dce75cd3ac631e44f9546f0502b08044, type: 3}
+  - {fileID: 21300000, guid: 2c0373f4799f6774b851b0397518a725, type: 3}
+  - {fileID: 21300000, guid: 9be6ca8208c4ba44d9ffa3ea87a6af33, type: 3}
+  - {fileID: 21300000, guid: 2a64bf372b67e804d93442b4364386d3, type: 3}
+  charactersContainer: {fileID: 0}
+  canvas: {fileID: 0}
+  isDialogCreatorMode: 0
+  extendedDialogManager: {fileID: 1614033500}
+--- !u!114 &1614033500 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -517850468094483802, guid: 1beaaeab63dc7ec4b88df413027811b0, type: 3}
+  m_PrefabInstance: {fileID: 1614033497}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614033498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e612dd5a621c1764390c2ca1806a4785, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1662257450
 GameObject:
   m_ObjectHideFlags: 0

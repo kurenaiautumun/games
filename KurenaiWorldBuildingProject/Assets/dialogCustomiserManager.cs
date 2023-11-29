@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR)
+
 using Doublsb.Dialog;
 using System.Collections;
 using System.Collections.Generic;
@@ -414,3 +416,5 @@ public class dialogCustomiserManager : MonoBehaviour
         SetCurrentIndex();
     }
 }
+
+#endif

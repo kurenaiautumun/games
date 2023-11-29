@@ -4467,6 +4467,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4094011681938070648, guid: d536fa71dd00cf349a228e41212ace48, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4094011681938070649, guid: d536fa71dd00cf349a228e41212ace48, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -4565,6 +4569,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4094011683457312917, guid: d536fa71dd00cf349a228e41212ace48, type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4532665532898427240, guid: d536fa71dd00cf349a228e41212ace48, type: 3}
+      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -7075,6 +7083,7 @@ MonoBehaviour:
   charactersContainer: {fileID: 0}
   canvas: {fileID: 0}
   isDialogCreatorMode: 0
+  loadedCharacters: []
   extendedDialogManager: {fileID: 1614033500}
 --- !u!114 &1614033500 stripped
 MonoBehaviour:
@@ -7949,6 +7958,58 @@ MonoBehaviour:
   pausePanelContainer: {fileID: 1895977864}
   activeLayerText: {fileID: 2004212427}
   activeGridText: {fileID: 1569915344}
+  touchPositionInputAction:
+    m_Name: Touch Position Input
+    m_Type: 0
+    m_ExpectedControlType: Vector2
+    m_Id: d2e17235-84a8-4dd2-90de-a54d5eb39696
+    m_Processors: 
+    m_Interactions: Press
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 6556df5b-8f0e-4c28-a34b-1b7f9b604a9f
+      m_Path: <Touchscreen>/position
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Touch Position Input
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 62a096d7-cf63-432d-afd9-727b7c8e2619
+      m_Path: <Mouse>/position
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Touch Position Input
+      m_Flags: 0
+    m_Flags: 0
+  touchPressInputAction:
+    m_Name: Touch Press Input
+    m_Type: 1
+    m_ExpectedControlType: Button
+    m_Id: b50f6731-f9f3-4979-b95b-f97d77f81714
+    m_Processors: 
+    m_Interactions: Press
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: ee01169f-f861-4e24-9b70-fb5237b1f543
+      m_Path: <Touchscreen>/Press
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Touch Press Input
+      m_Flags: 0
+    - m_Name: 
+      m_Id: c6bb6cce-b481-4c04-a6aa-84002a08c6b3
+      m_Path: <Mouse>/leftButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Touch Press Input
+      m_Flags: 0
+    m_Flags: 0
+  graphicRaycaster: {fileID: 801362019}
+  eventSystem: {fileID: 785811500}
   cameraController: {fileID: 519420034}
   baseSavePath: 
 --- !u!114 &1781544212

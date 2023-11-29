@@ -1,3 +1,5 @@
+#if (UNITY_EDITOR)
+
 // This is an extension built on top of the other Dialog Manager
 // This manager is aimed for dialogs with speech bubbles while the other is more RPG oriented (print on the bottom)
 // This asset is designed to be as close as possible to the original in order to preserve as many functionalities that are currently present
@@ -197,3 +199,5 @@ public class ExtendedDialogManager : MonoBehaviour
         printerRectTransform.sizeDelta = finalSize;
     }
 }
+
+#endif

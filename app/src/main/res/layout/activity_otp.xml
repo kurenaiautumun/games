@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".OTP"
+    android:background="@color/background_disp">
+
+    <TextView
+        android:id="@+id/initial_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="23sp"
+        android:textColor="@color/textcolor"
+        android:text="+91"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textAlignment="center"
+        android:layout_marginRight="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="300dp"
+        />
+
+    <EditText
+        android:id="@+id/OTPnumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="50dp"
+        android:hint="OTP"
+        android:inputType="phone"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/initial_number"
+        android:background="@drawable/edges"
+        android:padding="10dp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/verificationbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Verify"
+        app:layout_constraintEnd_toEndOf="@+id/OTPnumber"
+        app:layout_constraintStart_toStartOf="@+id/OTPnumber"
+        app:layout_constraintTop_toBottomOf="@+id/OTPnumber"
+        android:background="@drawable/button"
+        android:textColor="@color/white"
+        android:textStyle="bold"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

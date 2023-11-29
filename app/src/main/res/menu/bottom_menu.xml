@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/Bottom_home"
+        android:title="Home"
+        android:icon="@drawable/baseline_home_24"/>
+    <item android:id="@+id/Bottom_misses"
+        android:title="misses"
+        android:icon="@drawable/baseline_remove_red_eye_24"/>
+    <item android:id="@+id/Bottom_wrong"
+        android:title="wrong"
+        android:icon="@drawable/baseline_clear_24"/>
+</menu>

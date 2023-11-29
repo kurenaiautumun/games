@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Fragments.missesFragment">
+
+    <TextView
+        android:id="@+id/scienceMisses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Science"
+        android:textColor="@color/textcolor"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/scienceImageMisses"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scienceMisses" />
+
+    <TextView
+        android:id="@+id/moviesMisses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Movies"
+        android:textStyle="bold"
+        android:textSize="35sp"
+        android:textColor="@color/textcolor"
+        app:layout_constraintTop_toBottomOf="@id/scienceImageMisses"
+        />
+
+    <ImageView
+        android:id="@+id/moviesImageMisses"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/moviesMisses" />
+
+    <TextView
+        android:id="@+id/GKMisses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="GK"
+        android:textStyle="bold"
+        android:textSize="35sp"
+        android:textColor="@color/textcolor"
+        app:layout_constraintTop_toBottomOf="@id/moviesImageMisses"
+        />
+
+    <ImageView
+        android:id="@+id/GKImageMisses"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/GKMisses" />
+</androidx.constraintlayout.widget.ConstraintLayout>

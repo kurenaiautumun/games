@@ -60,8 +60,6 @@ public class ExtendedDialogManagerEditor : Editor
 public class ExtendedDialogManager : MonoBehaviour
 {
     private DialogManager dialogManager;
-    private GameObject printerObject, textObject;
-    private RectTransform printerRectTransform, textRectTransform;
     private GameObject currentTalkingCharacter;
     private bool isInitialized = false;
 
@@ -70,6 +68,7 @@ public class ExtendedDialogManager : MonoBehaviour
     public bool zoomInOnCharacters = true;
     public float zoomFactor = 1.0f;
     private float originalZoom;
+    private Vector3 originalCameraPosition;
 
     [Header("Misc Settings")]
     public GameObject charactersContainer;    
@@ -79,12 +78,9 @@ public class ExtendedDialogManager : MonoBehaviour
         isInitialized = false;
 
         dialogManager = GetComponent<DialogManager>();
-        printerObject = transform.GetChild(0).gameObject;
-        textObject = printerObject.transform.GetChild(0).gameObject;
-        printerRectTransform = printerObject.GetComponent<RectTransform>();
-        textRectTransform = textObject.GetComponent<RectTransform>();
 
         originalZoom = Camera.main.orthographicSize;
+        originalCameraPosition = Camera.main.transform.position;
 
         if (dialogManager != null )
             isInitialized = true;
@@ -99,8 +95,6 @@ public class ExtendedDialogManager : MonoBehaviour
     public void Show(DialogData Data)
     {
         dialogManager.OnPrintStartEvent += SwitchCurrentActiveTalkingCharacter;
-        dialogManager.OnPrintEvent += BubbleDialog;
-        dialogManager.OnPrintFinishedEvent += ResizePrinter;
         dialogManager.OnDialogEndedEvent += FinishedDialog;
 
         dialogManager.Show(Data);
@@ -109,8 +103,6 @@ public class ExtendedDialogManager : MonoBehaviour
     public void Show(List<DialogData> Data)
     {
         dialogManager.OnPrintStartEvent += SwitchCurrentActiveTalkingCharacter;
-        dialogManager.OnPrintEvent += BubbleDialog;
-        dialogManager.OnPrintFinishedEvent += ResizePrinter;
         dialogManager.OnDialogEndedEvent += FinishedDialog;
 
         dialogManager.Show(Data);
@@ -126,6 +118,11 @@ public class ExtendedDialogManager : MonoBehaviour
             isInitialized = true;
     }
 
+    public void SetZoomInOnCharacters(bool zoomIn)
+    {
+        zoomInOnCharacters = zoomIn;
+    }
+
     //================================================
     //Private Methods
     //================================================
@@ -134,8 +131,6 @@ public class ExtendedDialogManager : MonoBehaviour
     {
         // Unhook the functions from the events
         dialogManager.OnPrintStartEvent -= SwitchCurrentActiveTalkingCharacter;
-        dialogManager.OnPrintEvent -= BubbleDialog;
-        dialogManager.OnPrintFinishedEvent -= ResizePrinter;
         dialogManager.OnDialogEndedEvent -= FinishedDialog;
 
         // Fix the camera zoom
@@ -147,56 +142,26 @@ public class ExtendedDialogManager : MonoBehaviour
     {      
         // Get the current talking character
         currentTalkingCharacter = dialogManager.GetCurrentInGameCharacter();
-        var characterPos = currentTalkingCharacter.transform.position;
+        var characterPos = currentTalkingCharacter.transform.GetChild(0).position;
+
+        // Find the mouth position if it exists
+        var mouth = currentTalkingCharacter.transform.Find("Mouth");
+        if (mouth != null)
+            characterPos = mouth.gameObject.GetComponent<Transform>().position;
 
         // Zoom into the characters
         if (zoomInOnCharacters)
         {
             Camera.main.orthographicSize = originalZoom / zoomFactor;
             Camera.main.transform.position = new Vector3(characterPos.x, characterPos.y, Camera.main.transform.position.z);
-        }          
-
-        // Find the mouth position if it exists
-        var mouth = currentTalkingCharacter.transform.Find("Mouth");
-        if( mouth != null )
-            characterPos = mouth.gameObject.GetComponent<Transform>().position;
-
-        // Convert the world space position to screen position for UI elements
-        var bubbleScreenPos = Camera.main.WorldToScreenPoint(characterPos);
-        printerObject.transform.position = bubbleScreenPos;
-
-        // If flip is enabled, then bubble speech will flip accordingly (make sure the image is proper)
-        if (flipBubbleWithCharacter)
+        } else
         {
-            // We need to invert the printer's scale to mirror the bubble
-            // We also need to invert the text's scale and adjust the pivot to display the text correctly
-            if (currentTalkingCharacter.GetComponent<SpriteRenderer>().flipX)
+            if (Camera.main.orthographicSize != originalZoom || Camera.main.transform.position != originalCameraPosition)
             {
-                printerObject.transform.localScale = new Vector3(-1, 1, 1);
-                textObject.transform.localScale = new Vector3(-1, 1, 1);
-                textRectTransform.pivot = new Vector3(1, 0.5f, 0);
-            }
-            else
-            {
-                printerObject.transform.localScale = Vector3.one;
-                textObject.transform.localScale = Vector3.one;
-                textRectTransform.pivot = new Vector3(0, 0.5f, 0);
+                Camera.main.orthographicSize = originalZoom;
+                Camera.main.transform.position = originalCameraPosition;
             }
         }
-    }
-
-    private void BubbleDialog()
-    {
-        textObject.GetComponent<HorizontalLayoutGroup>().enabled = true;
-        textObject.GetComponent<ContentSizeFitter>().enabled = true;
-        ResizePrinter();
-    }
-
-    // If the size is not right, adjust it here (also check the printer object for the alignment)
-    private void ResizePrinter()
-    {
-        var finalSize = textRectTransform.sizeDelta + new Vector2(80, 50);
-        printerRectTransform.sizeDelta = finalSize;
     }
 }
 

@@ -86,7 +86,7 @@ public class speechTestScript : MonoBehaviour
 
     private void Start()
     {
-        dialogManager = GameObject.Find("DialogAssetBubble Variant").GetComponent<ExtendedDialogManager>();
+        dialogManager = GameObject.Find("DialogAsset").GetComponent<ExtendedDialogManager>();
         charactersContainer = dialogManager.gameObject.transform.Find("Characters").gameObject;
     }
 
@@ -95,9 +95,9 @@ public class speechTestScript : MonoBehaviour
         // Follows a similar structure to the normal dialog manager in order to be easy to learn and use
         var dialogTexts = new List<DialogData>();
         dialogTexts.Add(new DialogData("Hello! My name is\n/size:up//speed:down//color:red/ALICE/color:black//size:init//speed:init/", "Girl"));
-        dialogTexts.Add(new DialogData("Hello to you too!\n I'm a /size:120//color:green/COOK/color:black//size:init/", "Cook"));
+        dialogTexts.Add(new DialogData("Hello to you too!\n I'm a /size:100//color:green/COOK/color:black//size:init/", "Boy"));
         dialogTexts.Add(new DialogData("Nice meeting you here.", "Girl"));
-        dialogTexts.Add(new DialogData("Same!", "Cook"));
+        dialogTexts.Add(new DialogData("Same!", "Boy"));
         dialogManager.Show(dialogTexts);
     }
 

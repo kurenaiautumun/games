@@ -71,7 +71,9 @@ public class ExtendedDialogManager : MonoBehaviour
     private Vector3 originalCameraPosition;
 
     [Header("Misc Settings")]
-    public GameObject charactersContainer;    
+    public GameObject charactersContainer;
+
+    public string Result => dialogManager.Result;
 
     private void Start()
     {
@@ -139,7 +141,7 @@ public class ExtendedDialogManager : MonoBehaviour
     }
 
     private void SwitchCurrentActiveTalkingCharacter()
-    {      
+    {
         // Get the current talking character
         currentTalkingCharacter = dialogManager.GetCurrentInGameCharacter();
         var characterPos = currentTalkingCharacter.transform.GetChild(0).position;

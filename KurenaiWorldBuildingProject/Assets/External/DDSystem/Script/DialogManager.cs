@@ -102,7 +102,17 @@ namespace Doublsb.Dialog
                     StartCoroutine(_skip()); break;
 
                 case State.Wait:
-                    if (_current_Data.SelectList.Count <= 0) Hide(); break;
+                    {
+                        if (_current_Data.SelectList.Count <= 0)
+                        {
+                            Hide();
+                        }
+                        else if (!Selector.activeSelf)
+                        {
+                            state = State.Deactivate;
+                        }
+                        break;
+                    }
             }
         }
 
@@ -131,9 +141,11 @@ namespace Doublsb.Dialog
 
         #region Selector
 
-        public void Select(int index)
+        public IEnumerator Select(int index)
         {
             Result = _current_Data.SelectList.GetByIndex(index).Key;
+            Printer_Text.text = _current_Data.SelectList.GetByIndex(index).Value;
+            yield return new WaitForSeconds(1);
             Hide();
         }
 
@@ -225,6 +237,9 @@ namespace Doublsb.Dialog
 
             if (_current_Data.SelectList.Count > 0)
             {
+                state = State.Wait;
+                _find_character(_current_Data.SelectList.Character);
+                OnPrintStartEvent();
                 Selector.SetActive(true);
 
                 for (int i = 0; i < _current_Data.SelectList.Count; i++)
@@ -249,7 +264,7 @@ namespace Doublsb.Dialog
             SelectorItemText.text = _current_Data.SelectList.GetByIndex(index).Value;
 
             var NewItem = Instantiate(SelectorItem, Selector.transform);
-            NewItem.GetComponent<Button>().onClick.AddListener(() => Select(index));
+            NewItem.GetComponent<Button>().onClick.AddListener(() => StartCoroutine(Select(index)));
             NewItem.SetActive(true);
         }
 
@@ -262,8 +277,10 @@ namespace Doublsb.Dialog
             foreach (var Data in DataList)
             {
                 Show(Data);
-                _init_selector();
 
+                while (state != State.Deactivate) { yield return null; }
+
+                _init_selector();
                 while (state != State.Deactivate) { yield return null; }
             }
 

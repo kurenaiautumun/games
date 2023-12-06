@@ -93,11 +93,37 @@ public class speechTestScript : MonoBehaviour
     public void TestSpeech()
     {
         // Follows a similar structure to the normal dialog manager in order to be easy to learn and use
-        var dialogTexts = new List<DialogData>();
-        dialogTexts.Add(new DialogData("Hello! My name is\n/size:up//speed:down//color:red/ALICE/color:black//size:init//speed:init/", "Girl"));
-        dialogTexts.Add(new DialogData("Hello to you too!\n I'm a /size:100//color:green/COOK/color:black//size:init/", "Boy"));
-        dialogTexts.Add(new DialogData("Nice meeting you here.", "Girl"));
-        dialogTexts.Add(new DialogData("Same!", "Boy"));
+        var dialogTexts = new List<DialogData>
+        {
+            new DialogData("Hello! My name is\n/size:up//speed:down//color:red/ALICE/color:black//size:init//speed:init/", "Girl"),
+            new DialogData("Hello to you too!\n I'm a /size:100//color:green/COOK/color:black//size:init/", "Boy"),
+            new DialogData("Nice meeting you here.", "Girl"),
+            new DialogData("Same!", "Boy")
+        };
+
+        DialogData optionsData = new DialogData("Do you like cooking?", "Boy");
+        optionsData.SelectList.Character = "Girl";
+        optionsData.SelectList.Add("True", "Yeah I sure do!");
+        optionsData.SelectList.Add("Neutral", "Umm it's okay.");
+        optionsData.SelectList.Add("False", "Nope, really hate it.");
+        optionsData.Callback = () =>
+        {
+            List<DialogData> dialogs = new List<DialogData>();
+            if (dialogManager.Result == "True")
+            {
+                dialogs.Add(new DialogData("That sounds great. Let's make something together.", "Boy"));
+            } else if (dialogManager.Result == "Neutral")
+            {
+                dialogs.Add(new DialogData("Oh, let' cook something. Maybe cooking will grow on you...", "Boy"));
+                dialogs.Add(new DialogData("I hope so.", "Girl"));
+            } else
+            {
+                dialogs.Add(new DialogData("That's sad to hear. Maybe if you try it, you will change your mind.", "Boy"));
+            }
+            dialogManager.Show(dialogs);
+        };
+
+        dialogTexts.Add(optionsData);
         dialogManager.Show(dialogTexts);
     }
 

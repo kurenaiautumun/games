@@ -352,6 +352,8 @@ namespace Doublsb.Dialog
 
     public class DialogSelect
     {
+        public string Character;
+
         private List<DialogSelectItem> ItemList;
 
         public DialogSelect()

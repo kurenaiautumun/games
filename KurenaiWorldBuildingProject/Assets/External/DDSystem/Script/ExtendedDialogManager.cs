@@ -135,9 +135,12 @@ public class ExtendedDialogManager : MonoBehaviour
         dialogManager.OnPrintStartEvent -= SwitchCurrentActiveTalkingCharacter;
         dialogManager.OnDialogEndedEvent -= FinishedDialog;
 
-        // Fix the camera zoom
+        // Fix the camera zoom and position
         if(zoomInOnCharacters)
+        {
             Camera.main.orthographicSize = originalZoom;
+            Camera.main.transform.position = originalCameraPosition;
+        }
     }
 
     private void SwitchCurrentActiveTalkingCharacter()

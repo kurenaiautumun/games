@@ -80,6 +80,7 @@ public class speechTestEditor : Editor
 
 public class speechTestScript : MonoBehaviour
 {
+    public bool testSpeechOnStart = true;
     // Remember to get a reference to the extended variant for speech bubbles
     private ExtendedDialogManager dialogManager;
     private GameObject charactersContainer;
@@ -88,6 +89,8 @@ public class speechTestScript : MonoBehaviour
     {
         dialogManager = GameObject.Find("DialogAsset").GetComponent<ExtendedDialogManager>();
         charactersContainer = dialogManager.gameObject.transform.Find("Characters").gameObject;
+        if (testSpeechOnStart)
+            TestSpeech();
     }
 
     public void TestSpeech()

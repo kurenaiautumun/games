@@ -7,6 +7,7 @@
 // Also note that there are separate dialog assets and character assets for both types
 
 using Doublsb.Dialog;
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -75,6 +76,20 @@ public class ExtendedDialogManager : MonoBehaviour
 
     public string Result => dialogManager.Result;
 
+    private class DialogItem
+    {
+        public string Character;
+        public string Dialog;
+        public string SelectCharacter;
+        public List<string[]> SelectList;
+    }
+
+    private class DialogBranch
+    {
+        public string Name;
+        public List<DialogItem> Dialogs;
+    }
+
     private void Start()
     {
         isInitialized = false;
@@ -123,6 +138,59 @@ public class ExtendedDialogManager : MonoBehaviour
     public void SetZoomInOnCharacters(bool zoomIn)
     {
         zoomInOnCharacters = zoomIn;
+    }
+
+    public void LoadFromJson(string dataPath)
+    {
+        try
+        {
+            Dictionary<string, List<DialogData>> data = new Dictionary<string, List<DialogData>>();
+
+            string json = ((TextAsset)Resources.Load(dataPath)).text;
+            List<DialogBranch> items = JsonConvert.DeserializeObject<List<DialogBranch>>(json);
+
+            foreach (DialogBranch item in items)
+            {
+                List<DialogData> dialogs = new List<DialogData>();
+                foreach (DialogItem jsonDialog in item.Dialogs)
+                {
+                    DialogData dialogData = new DialogData(jsonDialog.Dialog, jsonDialog.Character);
+
+                    if (jsonDialog.SelectCharacter != null)
+                    {
+                        if (jsonDialog.SelectList.Count > 0)
+                        {
+                            dialogData.SelectList.Character = jsonDialog.SelectCharacter;
+
+                            foreach (string[] selectOption in jsonDialog.SelectList)
+                            {
+                                dialogData.SelectList.Add(selectOption[0], selectOption[1]);
+                            }
+
+                            dialogData.Callback = () =>
+                            {
+                                if (data.TryGetValue(Result, out List<DialogData> dialogItems))
+                                {
+                                    Show(dialogItems);
+                                }
+                                else
+                                {
+                                    LoadFromJson(dataPath.Substring(0, dataPath.LastIndexOf('/') + 1) + Result);
+                                }
+                            };
+                        }
+                    }
+
+                    dialogs.Add(dialogData);
+                }
+                data.Add(item.Name, dialogs);
+            }
+
+            Show(data["Main"]);
+        } catch(System.Exception e)
+        {
+            Debug.LogError("Exception: " + e.Message);
+        }
     }
 
     //================================================

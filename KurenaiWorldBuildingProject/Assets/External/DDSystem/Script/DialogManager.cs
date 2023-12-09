@@ -130,11 +130,6 @@ namespace Doublsb.Dialog
 
             state = State.Deactivate;
 
-            if (_current_Data.Callback != null)
-            {
-                _current_Data.Callback.Invoke();
-                _current_Data.Callback = null;
-            }
         }
 
         #endregion
@@ -286,6 +281,12 @@ namespace Doublsb.Dialog
 
             if (OnDialogEndedEvent != null)
                 OnDialogEndedEvent();
+
+            if (_current_Data.Callback != null)
+            {
+                _current_Data.Callback.Invoke();
+                _current_Data.Callback = null;
+            }
         }
 
         private IEnumerator Activate()

@@ -1,0 +1,35 @@
+[
+    {
+        "Name": "Main",
+        "Dialogs": [
+            {
+                "Character": "Boy",
+                "Dialog": "Oh, so what do you like to do?"
+            },
+            {
+                "Character": "Girl",
+                "Dialog": "I love to go on an Adventure."
+            },
+            {
+                "Character": "Boy",
+                "Dialog": "Is that so? I've /size:up//color:blue/ALWAYS/color:white//size:init/ wanted to go on an adventure."
+            },
+            {
+                "Character": "Girl",
+                "Dialog": "That's great. I'm about to go on a dangerous one now. I've been wanting someone to help me. Wanna tag along?"
+            },
+            {
+                "Character": "Boy",
+                "Dialog": "That sounds lovely!"
+            },
+            {
+                "Character": "Boy",
+                "Dialog": "WAIT, I DON'T HAVE TO FIGHT, RIGHT?"
+            },
+            {
+                "Character": "Girl",
+                "Dialog": "No, I'll be doing the fighting. You can help me by making delicious food."
+            }
+        ]
+    }
+]

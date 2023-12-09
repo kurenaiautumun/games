@@ -1,0 +1,69 @@
+[
+    {
+        "Name": "Main",
+        "Dialogs": [
+            {
+                "Character": "Girl",
+                "Dialog": "Hello! My name is\n/size:up//speed:down//color:red/ALICE/color:black//size:init//speed:init/"
+            },
+            {
+                "Character": "Boy",
+                "Dialog": "Hello to you too!\n I'm a /size:100//color:green/COOK/color:black//size:init/"
+            },
+            {
+                "Character": "Girl",
+                "Dialog": "Nice meeting you here."
+            },
+            {
+                "Character": "Boy",
+                "Dialog": "Do you like cooking?",
+                "SelectCharacter": "Girl",
+                "SelectList": [
+                    [
+                        "True",
+                        "Yeah I sure do!"
+                    ],
+                    [
+                        "Neutral",
+                        "Umm it's okay."
+                    ],
+                    [
+                        "False",
+                        "Nope, really hate it."
+                    ]
+                ]
+            }
+        ]
+    },
+    {
+        "Name": "True",
+        "Dialogs": [
+            {
+                "Character": "Boy",
+                "Dialog": "That sounds great. Let's make something together."
+            }
+        ]
+    },
+    {
+        "Name": "Neutral",
+        "Dialogs": [
+            {
+                "Character": "Boy",
+                "Dialog": "Oh, let' cook something. Maybe cooking will grow on you..."
+            },
+            {
+                "Character": "Girl",
+                "Dialog": "I hope so."
+            }
+        ]
+    },
+    {
+        "Name": "Falsee",
+        "Dialogs": [
+            {
+                "Character": "Boy",
+                "Dialog": "That's sad to hear. Maybe if you try it, you will change your mind."
+            }
+        ]
+    }
+]

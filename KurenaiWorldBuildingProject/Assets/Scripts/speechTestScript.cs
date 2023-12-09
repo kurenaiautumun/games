@@ -32,7 +32,7 @@ public class speechTestEditor : Editor
 
         if (GUILayout.Button("Start test conversation"))
         {
-            myTarget.TestSpeech();
+            myTarget.TestSpeechFromJson();
         }
 
         talkingCharacterOptions = myTarget.GetCharacters();    
@@ -90,7 +90,7 @@ public class speechTestScript : MonoBehaviour
         dialogManager = GameObject.Find("DialogAsset").GetComponent<ExtendedDialogManager>();
         charactersContainer = dialogManager.gameObject.transform.Find("Characters").gameObject;
         if (testSpeechOnStart)
-            TestSpeech();
+            TestSpeechFromJson();
     }
 
     public void TestSpeech()
@@ -128,6 +128,11 @@ public class speechTestScript : MonoBehaviour
 
         dialogTexts.Add(optionsData);
         dialogManager.Show(dialogTexts);
+    }
+
+    public void TestSpeechFromJson()
+    {
+        dialogManager.LoadFromJson("Dialogs/Dialog");
     }
 
     public void TestDialog(string dialog, string character)

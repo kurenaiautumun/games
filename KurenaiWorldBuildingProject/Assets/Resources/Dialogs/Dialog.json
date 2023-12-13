@@ -4,33 +4,47 @@
         "Dialogs": [
             {
                 "Character": "Girl",
-                "Dialog": "Hello! My name is\n/size:up//speed:down//color:red/ALICE/color:black//size:init//speed:init/"
+                "Audio": "Introduction",
+                "Dialog": "Hello! My name is\n/size:up//speed:down//color:red/ALICE/color:black//size:init//speed:init/",
+                "ZoomIn": "True"
             },
             {
                 "Character": "Boy",
-                "Dialog": "Hello to you too!\n I'm a /size:100//color:green/COOK/color:black//size:init/"
+                "Audio": "Introduction",
+                "Dialog": "Hello to you too!\n I'm a /size:100//color:green/COOK/color:black//size:init/",
+                "ZoomIn": "False"
             },
             {
                 "Character": "Girl",
-                "Dialog": "Nice meeting you here."
+                "Audio": "NiceMeetingYouHere",
+                "Dialog": "Nice meeting you here.",
+                "ZoomIn": "True"
             },
             {
                 "Character": "Boy",
+                "Audio": "DoYouLikeCooking",
                 "Dialog": "Do you like cooking?",
+                "ZoomIn": "False",
                 "SelectCharacter": "Girl",
                 "SelectList": [
-                    [
-                        "True",
-                        "Yeah I sure do!"
-                    ],
-                    [
-                        "Neutral",
-                        "Umm it's okay."
-                    ],
-                    [
-                        "False",
-                        "Nope, really hate it."
-                    ]
+                    {
+                        "Key": "True",
+                        "Audio": "YeahISureDo",
+                        "Dialog": "Yeah I sure do!",
+                        "ZoomIn": "True"
+                    },
+                    {
+                        "Key": "Neutral",
+                        "Audio": "UmmItsOkay",
+                        "Dialog": "Umm it's okay.",
+                        "ZoomIn": "False"
+                    },
+                    {
+                        "Key": "False",
+                        "Audio": "NopeReallyHateIt",
+                        "Dialog": "Nope, really hate it.",
+                        "ZoomIn": "True"
+                    }
                 ]
             }
         ]
@@ -40,6 +54,7 @@
         "Dialogs": [
             {
                 "Character": "Boy",
+                "Audio": "TrueOption",
                 "Dialog": "That sounds great. Let's make something together."
             }
         ]
@@ -49,20 +64,13 @@
         "Dialogs": [
             {
                 "Character": "Boy",
+                "Audio": "NeutralOption",
                 "Dialog": "Oh, let' cook something. Maybe cooking will grow on you..."
             },
             {
                 "Character": "Girl",
+                "Audio": "NeutralOption",
                 "Dialog": "I hope so."
-            }
-        ]
-    },
-    {
-        "Name": "Falsee",
-        "Dialogs": [
-            {
-                "Character": "Boy",
-                "Dialog": "That's sad to hear. Maybe if you try it, you will change your mind."
             }
         ]
     }

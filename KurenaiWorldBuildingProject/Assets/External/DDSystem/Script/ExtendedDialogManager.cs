@@ -76,12 +76,22 @@ public class ExtendedDialogManager : MonoBehaviour
 
     public string Result => dialogManager.Result;
 
+    private class DialogSelectItem
+    {
+        public string Key;
+        public string Audio;
+        public string Dialog;
+        public bool ZoomIn;
+    }
+
     private class DialogItem
     {
         public string Character;
+        public string Audio;
         public string Dialog;
+        public string ZoomIn;
         public string SelectCharacter;
-        public List<string[]> SelectList;
+        public List<DialogSelectItem> SelectList;
     }
 
     private class DialogBranch
@@ -155,6 +165,15 @@ public class ExtendedDialogManager : MonoBehaviour
                 foreach (DialogItem jsonDialog in item.Dialogs)
                 {
                     DialogData dialogData = new DialogData(jsonDialog.Dialog, jsonDialog.Character);
+                    if (jsonDialog.Audio != null)
+                    {
+                        dialogData.Commands.Insert(0, new DialogCommand(Command.sound, jsonDialog.Audio));
+                    }
+
+                    if (jsonDialog.ZoomIn != null)
+                    {
+                        dialogData.zoomIn = bool.Parse(jsonDialog.ZoomIn);
+                    }
 
                     if (jsonDialog.SelectCharacter != null)
                     {
@@ -162,9 +181,9 @@ public class ExtendedDialogManager : MonoBehaviour
                         {
                             dialogData.SelectList.Character = jsonDialog.SelectCharacter;
 
-                            foreach (string[] selectOption in jsonDialog.SelectList)
+                            foreach (DialogSelectItem selectOption in jsonDialog.SelectList)
                             {
-                                dialogData.SelectList.Add(selectOption[0], selectOption[1]);
+                                dialogData.SelectList.Add(selectOption.Key, selectOption.Dialog, selectOption.Audio, selectOption.ZoomIn);
                             }
 
                             dialogData.Callback = () =>
@@ -204,7 +223,7 @@ public class ExtendedDialogManager : MonoBehaviour
         dialogManager.OnDialogEndedEvent -= FinishedDialog;
 
         // Fix the camera zoom and position
-        if(zoomInOnCharacters)
+        if(dialogManager.ZoomInOnCurrentCharacter())
         {
             Camera.main.orthographicSize = originalZoom;
             Camera.main.transform.position = originalCameraPosition;
@@ -223,7 +242,7 @@ public class ExtendedDialogManager : MonoBehaviour
             characterPos = mouth.gameObject.GetComponent<Transform>().position;
 
         // Zoom into the characters
-        if (zoomInOnCharacters)
+        if (dialogManager.ZoomInOnCurrentCharacter())
         {
             Camera.main.orthographicSize = originalZoom / zoomFactor;
             Camera.main.transform.position = new Vector3(characterPos.x, characterPos.y, Camera.main.transform.position.z);

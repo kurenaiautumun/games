@@ -68,6 +68,7 @@ namespace Doublsb.Dialog
         //================================================
         private Character _current_Character;
         private DialogData _current_Data;
+        private DialogSelectItem _selected_Item = null;
 
         private float _currentDelay;
         private float _lastDelay;
@@ -127,9 +128,15 @@ namespace Doublsb.Dialog
             Printer.SetActive(false);
             Characters.SetActive(false);
             Selector.SetActive(false);
+            _selected_Item = null;
 
             state = State.Deactivate;
 
+        }
+
+        public bool ZoomInOnCurrentCharacter()
+        {
+            return _selected_Item != null ? _selected_Item.ZoomIn : _current_Data.zoomIn;
         }
 
         #endregion
@@ -138,9 +145,11 @@ namespace Doublsb.Dialog
 
         public IEnumerator Select(int index)
         {
-            Result = _current_Data.SelectList.GetByIndex(index).Key;
-            Printer_Text.text = _current_Data.SelectList.GetByIndex(index).Value;
-            yield return new WaitForSeconds(1);
+            _selected_Item = _current_Data.SelectList.GetByIndex(index);
+            Result = _selected_Item.Key;
+            OnPrintStartEvent();
+            Printer_Text.text = _selected_Item.Value;
+            yield return new WaitForSeconds(Play_CallSE(_selected_Item.Audio));
             Hide();
         }
 
@@ -157,7 +166,7 @@ namespace Doublsb.Dialog
             }
         }
 
-        public void Play_CallSE(string SEname)
+        public float Play_CallSE(string SEname)
         {
             if (_current_Character != null)
             {
@@ -166,7 +175,10 @@ namespace Doublsb.Dialog
 
                 CallAudio.clip = FindSE;
                 CallAudio.Play();
+                return CallAudio.clip.length;
             }
+
+            return 0;
         }
 
         #endregion
@@ -242,8 +254,11 @@ namespace Doublsb.Dialog
                     _add_selectorItem(i);
                 }
             }
-
-            else Selector.SetActive(false);
+            else
+            {
+                Selector.SetActive(false);
+                _selected_Item = null;
+            }
         }
 
         private void _clear_selector()
@@ -359,7 +374,6 @@ namespace Doublsb.Dialog
                 _current_Data.PrintText += Text[i];
                 Printer_Text.text = _current_Data.PrintText + _current_Data.Format.CloseTagger;
 
-                if (Text[i] != ' ') Play_ChatSE();
                 if (_currentDelay != 0) yield return new WaitForSeconds(_currentDelay);
                 if (OnPrintEvent != null)
                     OnPrintEvent();

@@ -134,6 +134,7 @@ namespace Doublsb.Dialog
 
         public bool isSkippable = true;
         public UnityAction Callback = null;
+        public bool zoomIn = true;
 
         //================================================
         //Public Method
@@ -386,9 +387,9 @@ namespace Doublsb.Dialog
             ItemList.Clear();
         }
 
-        public void Add(string Key, string Value)
+        public void Add(string Key, string Value, string Audio = "", bool ZoomIn = true)
         {
-            ItemList.Add(new DialogSelectItem(Key, Value));
+            ItemList.Add(new DialogSelectItem(Key, Value, Audio, ZoomIn));
         }
 
         public void Remove(string Key)
@@ -403,16 +404,20 @@ namespace Doublsb.Dialog
     {
         public string Key;
         public string Value;
+        public string Audio;
+        public bool ZoomIn;
 
         public bool isSameKey(string key)
         {
             return Key == key;
         }
 
-        public DialogSelectItem(string key, string value)
+        public DialogSelectItem(string key, string value, string audio = "", bool zoomIn = true)
         {
             this.Key = key;
             this.Value = value;
+            this.Audio = audio;
+            this.ZoomIn = zoomIn;
         }
     }
 }

@@ -1,5 +1,3 @@
-#if (UNITY_EDITOR)
-
 using Doublsb.Dialog;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
+#if (UNITY_EDITOR)
 [CustomEditor(typeof(dialogCustomiserManager))]
 public class dialogCustomiserEditor : Editor
 {
@@ -29,6 +28,7 @@ public class dialogCustomiserEditor : Editor
         }
     }
 }
+#endif
 
 public class dialogCustomiserManager : MonoBehaviour
 {
@@ -38,6 +38,7 @@ public class dialogCustomiserManager : MonoBehaviour
     public bool isDialogCreatorMode;
     public List<GameObject> loadedCharacters;
 
+    public GameObject characterPrefab;
     public ExtendedDialogManager extendedDialogManager;
     private DialogManager dialogManager;
     private GameObject edmprinterObject, printerObject, textObject;
@@ -165,7 +166,7 @@ public class dialogCustomiserManager : MonoBehaviour
 
         // Hook the functions
         dialogManager.OnPrintFinishedEvent += SwitchBubble;
-        dialogManager.OnDialogEndedEvent += ResetDialog;
+        dialogManager.OnDialogBranchEndedEvent += ResetDialog;
 
         // Add the dialogs from the list
         List < DialogData> dialogdata = new List < DialogData>();
@@ -189,7 +190,6 @@ public class dialogCustomiserManager : MonoBehaviour
         }
         
         // We just do a check first if the correct characters are already added else we will add them
-        GameObject characterPrefab = AssetDatabase.LoadAssetAtPath("Assets/External/DDSystem/Prefab/BindedCharacter.prefab", typeof(GameObject)) as GameObject;
         var edmcharcontainer = extendedDialogManager.gameObject.transform.Find("Characters");
         for(int i = 0; i < charactersContainer.transform.childCount;i++)
         {
@@ -203,7 +203,7 @@ public class dialogCustomiserManager : MonoBehaviour
         }
 
         // We want to show the creator UI again if we are in creator mode
-        dialogManager.OnDialogEndedEvent += EndPreviewDialogMode;
+        dialogManager.OnDialogBranchEndedEvent += EndPreviewDialogMode;
     }
 
     // If we are in creator mode then we want the UI to be enabled again (and the extended manager object to be disabled)
@@ -215,7 +215,7 @@ public class dialogCustomiserManager : MonoBehaviour
             extendedDialogManager.gameObject.SetActive(false);
         }
 
-        dialogManager.OnDialogEndedEvent -= EndPreviewDialogMode;
+        dialogManager.OnDialogBranchEndedEvent -= EndPreviewDialogMode;
     }
 
     // Change the bubble's image
@@ -231,7 +231,7 @@ public class dialogCustomiserManager : MonoBehaviour
     {
         currentIndex = 0;
         dialogManager.OnPrintFinishedEvent -= SwitchBubble;
-        dialogManager.OnDialogEndedEvent -= ResetDialog;
+        dialogManager.OnDialogBranchEndedEvent -= ResetDialog;
     }
 
     ////////////////////////////////
@@ -416,5 +416,3 @@ public class dialogCustomiserManager : MonoBehaviour
         SetCurrentIndex();
     }
 }
-
-#endif

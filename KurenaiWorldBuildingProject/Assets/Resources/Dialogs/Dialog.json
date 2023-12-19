@@ -3,45 +3,45 @@
         "Name": "Main",
         "Dialogs": [
             {
+                "Name": "GirlIntroduction",
                 "Character": "Girl",
-                "Audio": "Introduction",
                 "Dialog": "Hello! My name is\n/size:up//speed:down//color:red/ALICE/color:black//size:init//speed:init/",
                 "ZoomIn": "True"
             },
             {
+                "Name": "BoyIntroduction",
                 "Character": "Boy",
-                "Audio": "Introduction",
                 "Dialog": "Hello to you too!\n I'm a /size:100//color:green/COOK/color:black//size:init/",
                 "ZoomIn": "False"
             },
             {
+                "Name": "NiceMeetingYouHere",
                 "Character": "Girl",
-                "Audio": "NiceMeetingYouHere",
                 "Dialog": "Nice meeting you here.",
                 "ZoomIn": "True"
             },
             {
+                "Name": "DoYouLikeCooking",
                 "Character": "Boy",
-                "Audio": "DoYouLikeCooking",
                 "Dialog": "Do you like cooking?",
-                "ZoomIn": "False",
+                "ZoomIn": "True",
                 "SelectCharacter": "Girl",
                 "SelectList": [
                     {
-                        "Key": "True",
-                        "Audio": "YeahISureDo",
+                        "Name": "YeahISureDo",
+                        "BranchName": "True",
                         "Dialog": "Yeah I sure do!",
                         "ZoomIn": "True"
                     },
                     {
-                        "Key": "Neutral",
-                        "Audio": "UmmItsOkay",
+                        "Name": "UmmItsOkay",
+                        "BranchName": "Neutral",
                         "Dialog": "Umm it's okay.",
-                        "ZoomIn": "False"
+                        "ZoomIn": "True"
                     },
                     {
-                        "Key": "False",
-                        "Audio": "NopeReallyHateIt",
+                        "Name": "NopeReallyHateIt",
+                        "BranchName": "False",
                         "Dialog": "Nope, really hate it.",
                         "ZoomIn": "True"
                     }
@@ -53,8 +53,8 @@
         "Name": "True",
         "Dialogs": [
             {
+                "Name": "TrueOption",
                 "Character": "Boy",
-                "Audio": "TrueOption",
                 "Dialog": "That sounds great. Let's make something together."
             }
         ]
@@ -63,13 +63,13 @@
         "Name": "Neutral",
         "Dialogs": [
             {
+                "Name": "BoyNeutralOption",
                 "Character": "Boy",
-                "Audio": "NeutralOption",
                 "Dialog": "Oh, let' cook something. Maybe cooking will grow on you..."
             },
             {
+                "Name": "GirlNeutralOption",
                 "Character": "Girl",
-                "Audio": "NeutralOption",
                 "Dialog": "I hope so."
             }
         ]

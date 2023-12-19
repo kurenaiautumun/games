@@ -3,40 +3,51 @@
         "Name": "Main",
         "Dialogs": [
             {
+                "Name": "WhatDoYouLikeToDo",
                 "Character": "Boy",
-                "Audio": "WhatDoYouLikeToDo",
                 "Dialog": "Oh, so what do you like to do?"
             },
             {
+                "Name": "ILoveToGoOnAdventure",
                 "Character": "Girl",
-                "Audio": "ILoveToGoOnAdventure",
                 "Dialog": "I love to go on an Adventure."
             },
             {
+                "Name": "IsThatSo",
                 "Character": "Boy",
-                "Audio": "IsThatSo",
                 "Dialog": "Is that so? I've /size:up//color:blue/ALWAYS/color:white//size:init/ wanted to go on an adventure."
             },
             {
+                "Name": "ThatsGreat",
                 "Character": "Girl",
-                "Audio": "ThatsGreat",
                 "Dialog": "That's great. I'm about to go on a dangerous one now. I've been wanting someone to help me. Wanna tag along?"
             },
             {
+                "Name": "ThatSoundsLovely",
                 "Character": "Boy",
-                "Audio": "ThatSoundsLovely",
                 "Dialog": "That sounds lovely!"
             },
             {
+                "Name": "WaitIDontHaveToFightRight",
                 "Character": "Boy",
-                "Audio": "WaitIDontHaveToFightRight",
                 "Dialog": "WAIT, I DON'T HAVE TO FIGHT, RIGHT?",
                 "ZoomIn": "False"
             },
             {
+                "Name": "NoIllBeDoingTheFighting",
                 "Character": "Girl",
-                "Audio": "NoIllBeDoingTheFighting",
                 "Dialog": "No, I'll be doing the fighting. You can help me by making delicious food."
+            },
+            {
+                "Name": "OkayIllNeedFruits",
+                "Character": "Boy",
+                "Dialog": "Okay, I'll need fruits and vegetables for that. How about we plant something and harvest it?",
+                "ZoomIn": "False"
+            },
+            {
+                "Name": "OkayIllDoThatNow",
+                "Character": "Girl",
+                "Dialog": "Okay, I'll do that now."
             }
         ]
     }

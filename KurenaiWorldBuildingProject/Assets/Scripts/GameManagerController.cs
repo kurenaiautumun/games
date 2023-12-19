@@ -8,7 +8,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using Color = UnityEngine.Color;
 using Doublsb.Dialog;
-using UnityEditor;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -67,7 +66,8 @@ public class GameManagerController : MonoBehaviour
     private Vector3 topDownViewCameraPos, sideViewCameraPos;
     private float topDownViewZoom, sideViewZoom;
     private int sideViewActiveLayer;
-    private int sideViewActiveGrid, topViewActiveGrid;
+    private int topViewActiveGrid;
+    public int sideViewActiveGrid;
     private GameObject topDownMode;
     private GameObject sideMode;
     private PlayingField[] playingFields;
@@ -112,26 +112,34 @@ public class GameManagerController : MonoBehaviour
     [SerializeField] private GameObject itemPickerDropdownContainer;
     [SerializeField] private GameObject gameUIPanelContainer;
     [SerializeField] private GameObject pausePanelContainer;
-    [SerializeField] private TMP_Text activeLayerText, activeGridText;
+    [SerializeField] private TMP_Text gridInteractionModeText, activeLayerText, activeGridText;
 
     [Header("Touch Section")]
     [SerializeField] private InputAction touchPositionInputAction, touchPressInputAction;
-    [SerializeField] private GraphicRaycaster graphicRaycaster;
+    [SerializeField] private GraphicRaycaster canvasGraphicRaycaster;
+    [SerializeField] private GraphicRaycaster dialogGraphicRaycaster;
     [SerializeField] private EventSystem eventSystem;
 
     [Header("Misc Section")]
     public CameraController cameraController;
     private DialogManager dialogManager;
-    //private ExtendedDialogManager extendedDialogManager;
-    //private dialogCustomiserManager dialogCustomiserManager;
+    private ExtendedDialogManager extendedDialogManager;
+    private dialogCustomiserManager dialogCustomiserManager;
     //We are using the bubble type manager for characters, so load/save is done through the bubble variant
     //The RPG variant is only used for displaying info when we select an object in side view
+
+    public delegate void objectPlacedDelegate(GameObject item);
+    public event objectPlacedDelegate OnObjectPlacedEvent;
+    public delegate void subGridChangedDelegate(int subgridIndex);
+    public event subGridChangedDelegate OnSubGridChanged;
 
     private Vector2 previousTouchLocation;
     private bool hasInputTouchDragged;
     private bool isGamePaused;
     public string baseSavePath;
     private string baseScreenshotPath;
+
+    public Vector2Int PlayingFieldGridCount => playingFieldGridCount;
 
     void Start()
     {
@@ -145,8 +153,8 @@ public class GameManagerController : MonoBehaviour
         }
 
         dialogManager = GameObject.Find("DialogAsset").GetComponent<DialogManager>();
-        //extendedDialogManager = GameObject.Find("DialogAssetBubble Variant").GetComponent<ExtendedDialogManager>();
-        //dialogCustomiserManager = extendedDialogManager.GetComponent<dialogCustomiserManager>();
+        extendedDialogManager = GameObject.Find("DialogAsset").GetComponent<ExtendedDialogManager>();
+        dialogCustomiserManager = extendedDialogManager.GetComponent<dialogCustomiserManager>();
 
         previousTouchLocation = new Vector3(Screen.width / 2, Screen.height / 2, 0);
 
@@ -222,27 +230,30 @@ public class GameManagerController : MonoBehaviour
         pointerEventData.position = touchPosition;
 
         List<RaycastResult> results = new List<RaycastResult>();
-        graphicRaycaster.Raycast(pointerEventData, results);
+        canvasGraphicRaycaster.Raycast(pointerEventData, results);
 
         if (results.Count > 0)
             return true;
 
         itemPickerDropdownContainer.GetComponentInChildren<GraphicRaycaster>()?.Raycast(pointerEventData, results);
+
+        if (results.Count > 0)
+            return true;
+
+        dialogGraphicRaycaster?.Raycast(pointerEventData, results);
+
         return results.Count > 0;
     }
 
     private IEnumerator TouchDrag()
     {
         // Drag started
-
-        Vector3 difference = Vector3.zero, origin = Vector3.zero;
         if (IsPointerOverUI())
         {
             yield break;
         }
 
-        difference = Camera.main.ScreenToWorldPoint(touchPosition) - Camera.main.transform.position;
-        origin = Camera.main.ScreenToWorldPoint(touchPosition);
+        Vector3 origin = Camera.main.ScreenToWorldPoint(touchPosition);
         previousTouchLocation = touchPosition;
         SetHighlight(touchPosition, gridInteractionMode == GridInteractionMode.Place);
         hasInputTouchDragged = true;
@@ -471,6 +482,7 @@ public class GameManagerController : MonoBehaviour
         int gridIndex = playingFields[topViewActiveGrid].GetSubGridIndex(pos);
         Vector3 sizeOffset = (Vector3)(size - Vector2.one) * 0.5f;
         var gridObject = Instantiate(item, (gridPos + new Vector3(0.5f, 0.5f, 0) + sizeOffset) * gridCellSize, Quaternion.identity);
+        gridObject.name = item.name;
         gridObject.transform.SetParent(topDownObjectsHierarchy[topViewActiveGrid].transform);
         gridObject.GetComponent<GridObject>().gridPosition = gridPos;
         gridObject.GetComponent<GridObject>().id = itemID;
@@ -532,19 +544,25 @@ public class GameManagerController : MonoBehaviour
 
         if (component.type == objectType.Character)
         {
-            //var characterContainer = extendedDialogManager.transform.Find("Characters");
+            var characterContainer = extendedDialogManager.transform.Find("Characters");
             //GameObject characterPrefab = AssetDatabase.LoadAssetAtPath("Assets/External/DDSystem/Prefab/BindedCharacter.prefab", typeof(GameObject)) as GameObject;
-            //var go = Instantiate(characterPrefab, characterContainer);
-            //go.name = item.name;
-            //go.GetComponent<inGameCharacterBinderScript>().inGameCharacterRef = sideObject;
-            //sideObject.GetComponent<GridObject>().altViewObject = gridObject;
-            //sideObject.GetComponent<GridObject>().id = itemID;
+            GameObject characterPrefab = Resources.Load("Characters/" + item.name) as GameObject;
+            var go = Instantiate(characterPrefab, characterContainer);
+            go.name = item.name;
+            go.GetComponent<inGameCharacterBinderScript>().inGameCharacterRef = sideObject;
+            sideObject.GetComponent<GridObject>().altViewObject = gridObject;
+            sideObject.GetComponent<GridObject>().id = itemID;
             //dialogCustomiserManager.loadedCharacters.Add(sideObject);
 
-            //if(characterPrefab.name == go.name)
-            //{
-            //    Debug.Log("Remember to rename character in editor before saveing: " + go.name+"\nAlso, please reload the map to ensure the dialog manager properly renames and link the characters");
-            //}
+            if (characterPrefab.name == go.name)
+            {
+                Debug.Log("Remember to rename character in editor before saveing: " + go.name + "\nAlso, please reload the map to ensure the dialog manager properly renames and link the characters");
+            }
+        }
+
+        if (OnObjectPlacedEvent != null)
+        {
+            OnObjectPlacedEvent(gridObject);
         }
     }
 
@@ -784,7 +802,7 @@ public class GameManagerController : MonoBehaviour
     }
 
     // Sets which grid is being used
-    private void SetCurrentSubGridView(int grid)
+    public void SetCurrentSubGridView(int grid)
     {
         if (isSideModeEnabled && sideViewActiveLayer >= 0)
             SetSideViewShadings(sideViewActiveLayer);
@@ -849,8 +867,6 @@ public class GameManagerController : MonoBehaviour
             var gridPos = playingFields[topViewActiveGrid].GetSubGrid(grid);
             Camera.main.transform.position = new Vector3(gridPos.x * sideViewScreenSizeInWorldCoordinates.x * 2 + sideViewXGapBetweenObjects, 0, Camera.main.transform.position.z);
 
-            //Debug.Log(gridPos + "   :   " + screenWidth + "   :   " + Screen.width);
-
             SetSideViewScalings(gridPos.y * playingFieldSubGridSize.y);
             activeGridText.SetText("View: " + grid.ToString());
 
@@ -864,10 +880,15 @@ public class GameManagerController : MonoBehaviour
         }
         sideViewSpriteMasks[0].SetActive(false);
         sideViewSpriteMasks[1].SetActive(false);
+
+        if (OnSubGridChanged != null)
+        {
+            OnSubGridChanged(grid);
+        }
     }
 
     // Deactivates the objects of the previous sub grid
-    private void ClearPreviousSubGridView(int grid)
+    public void ClearPreviousSubGridView(int grid)
     {
         for (int i = grid; i < playingFieldCount; i += playingFieldGridCount.x)
         {
@@ -934,6 +955,12 @@ public class GameManagerController : MonoBehaviour
 
         while (sideViewMarkerHierarchy.transform.childCount > 0)
             DestroyImmediate(sideViewMarkerHierarchy.transform.GetChild(0).gameObject);
+    }
+
+    // Given a grid position, get the corresponding x index
+    public int GetSubGridXIndex(Vector2 gridPos)
+    {
+        return playingFields[topViewActiveGrid].GetSubGridXIndex(Vector2Int.RoundToInt(gridPos) - playingFieldOrigin);
     }
 
     // Sets the current grid if the map is multi-grid
@@ -1098,13 +1125,13 @@ public class GameManagerController : MonoBehaviour
             crossGridObjectsHierarchy[i].SetActive(false);
         }
 
-        //var characterContainer = extendedDialogManager.transform.Find("Characters");
-        //for (int idx = characterContainer.childCount - 1; idx >= 0 ; idx--)
-        //{
-        //    if (characterContainer.GetChild(idx).GetComponent<inGameCharacterBinderScript>() == null)
-        //        continue;
-        //    Destroy(characterContainer.GetChild(idx).gameObject);
-        //}
+        var characterContainer = extendedDialogManager.transform.Find("Characters");
+        for (int idx = characterContainer.childCount - 1; idx >= 0; idx--)
+        {
+            if (characterContainer.GetChild(idx).GetComponent<inGameCharacterBinderScript>() == null)
+                continue;
+            Destroy(characterContainer.GetChild(idx).gameObject);
+        }
 
         sideViewCrossGridObjects = new GameObject[gridsPerMapCount, playingFieldGridCount.x - 1, playingFields[0].size.y];
         sideViewMarkers = new GameObject[playingFields[topViewActiveGrid].size.x];
@@ -1132,7 +1159,7 @@ public class GameManagerController : MonoBehaviour
         mapData.name = fileName;
         mapData.gridCount = gridsPerMapCount;
 
-        //var characterContainer = extendedDialogManager.transform.Find("Characters");
+        var characterContainer = extendedDialogManager.transform.Find("Characters");
 
         // Loop through each grid in the map and get the data for each object
         for (int i = 0; i < gridsPerMapCount; i++)
@@ -1162,19 +1189,19 @@ public class GameManagerController : MonoBehaviour
 
                         if (component.type == objectType.Character)
                         {
-                            //for (int idx = 0; idx < characterContainer.childCount; idx++)
-                            //{
-                            //    var binder = characterContainer.GetChild(idx).GetComponent<inGameCharacterBinderScript>();
-                            //    if (binder == null)
-                            //        continue;
-                            //    var gridCharacter = binder.inGameCharacterRef.GetComponent<GridObject>().altViewObject;
-                            //    if (gridCharacter == item)
-                            //    {
-                            //        CharacterObjects c = new CharacterObjects(characterContainer.GetChild(idx).name, pos.x, pos.y);
-                            //        gridData.characterObjects.Add(c);
-                            //        break;
-                            //    }
-                            //}
+                            for (int idx = 0; idx < characterContainer.childCount; idx++)
+                            {
+                                var binder = characterContainer.GetChild(idx).GetComponent<inGameCharacterBinderScript>();
+                                if (binder == null)
+                                    continue;
+                                var gridCharacter = binder.inGameCharacterRef.GetComponent<GridObject>().altViewObject;
+                                if (gridCharacter == item)
+                                {
+                                    CharacterObjects c = new CharacterObjects(characterContainer.GetChild(idx).name, pos.x, pos.y);
+                                    gridData.characterObjects.Add(c);
+                                    break;
+                                }
+                            }
                         }
 
                     }
@@ -1211,7 +1238,7 @@ public class GameManagerController : MonoBehaviour
         string mapPath = Path.Combine(baseSavePath, mapFile);
         string jsonString = File.ReadAllText(mapPath);
         var mapData = JsonUtility.FromJson<MapData>(jsonString);
-        //var characterContainer = extendedDialogManager.transform.Find("Characters");
+        var characterContainer = extendedDialogManager.transform.Find("Characters");
         var dropdown = itemPickerDropdownContainer.GetComponent<TMP_Dropdown>();
 
         gridsPerMapCount = mapData.gridCount;
@@ -1240,22 +1267,22 @@ public class GameManagerController : MonoBehaviour
             foreach (var item in grid.characterObjects)
             {
                 Vector3 gridPos = new Vector3(item.gridPosX + playingFieldOrigin.x, item.gridPosY + playingFieldOrigin.y);
-                //for(int i = 0; i<characterContainer.childCount; i++)
-                //{
-                //    var child = characterContainer.GetChild(i);
-                //    var binder = child.GetComponent<inGameCharacterBinderScript>();
-                //    if(binder != null)
-                //    {
-                //        var gridCharacter = binder.inGameCharacterRef.GetComponent<GridObject>().altViewObject;
-                //        var charPos = gridCharacter.GetComponent<GridObject>().gridPosition;
-                //        if(charPos.x == gridPos.x && charPos.y == gridPos.y)
-                //        {
-                //            child.name = item.name;
-                //            gridCharacter.name = item.name;
-                //            binder.inGameCharacterRef.name = item.name;
-                //        }
-                //    }
-                //}
+                for (int i = 0; i < characterContainer.childCount; i++)
+                {
+                    var child = characterContainer.GetChild(i);
+                    var binder = child.GetComponent<inGameCharacterBinderScript>();
+                    if (binder != null)
+                    {
+                        var gridCharacter = binder.inGameCharacterRef.GetComponent<GridObject>().altViewObject;
+                        var charPos = gridCharacter.GetComponent<GridObject>().gridPosition;
+                        if (charPos.x == gridPos.x && charPos.y == gridPos.y)
+                        {
+                            child.name = item.name;
+                            gridCharacter.name = item.name;
+                            binder.inGameCharacterRef.name = item.name;
+                        }
+                    }
+                }
             }
         }
 
@@ -1424,40 +1451,60 @@ public class GameManagerController : MonoBehaviour
         RenderTexture.active = null;
     }
 
-    public void SwitchInteractionMode(GameObject buttonGameObject)
+    public void SwitchInteractionMode()
     {
-        TMP_Text text = buttonGameObject.GetComponentInChildren<TMP_Text>();
-
         switch (gridInteractionMode)
         {
             case GridInteractionMode.Select:
+                SwitchInteractionMode(GridInteractionMode.Place);
+                break;
+
+            case GridInteractionMode.Place:
+                SwitchInteractionMode(GridInteractionMode.Clear);
+                break;
+
+            case GridInteractionMode.Clear:
+                SwitchInteractionMode(GridInteractionMode.Select);
+                break;
+
+            default:
+                SwitchInteractionMode(GridInteractionMode.Select);
+                break;
+        }
+    }
+
+    public void SwitchInteractionMode(GridInteractionMode mode)
+    {
+        switch (mode)
+        {
+            case GridInteractionMode.Select:
+                gridInteractionMode = GridInteractionMode.Select;
+                gridInteractionModeText.SetText("Select");
+                SetHighlight(previousTouchLocation, false);
+                if (isSideModeEnabled)
+                    SetCurrentSideViewLayer(-1);
+                break;
+
+            case GridInteractionMode.Place:
                 gridInteractionMode = GridInteractionMode.Place;
-                text.SetText("Place");
+                gridInteractionModeText.SetText("Place");
                 SetHighlight(previousTouchLocation);
                 if (isSideModeEnabled)
                     SetCurrentSideViewLayer(0);
 
                 break;
 
-            case GridInteractionMode.Place:
+            case GridInteractionMode.Clear:
                 gridInteractionMode = GridInteractionMode.Clear;
-                text.SetText("Clear");
+                gridInteractionModeText.SetText("Clear");
                 SetHighlight(previousTouchLocation, false);
                 if (isSideModeEnabled)
                     SetCurrentSideViewLayer(0);
                 break;
 
-            case GridInteractionMode.Clear:
-                gridInteractionMode = GridInteractionMode.Select;
-                text.SetText("Select");
-                SetHighlight(previousTouchLocation, false);
-                if (isSideModeEnabled)
-                    SetCurrentSideViewLayer(-1);
-                break;
-
             default:
                 gridInteractionMode = GridInteractionMode.Select;
-                text.SetText("Select");
+                gridInteractionModeText.SetText("Select");
                 SetHighlight(previousTouchLocation, false);
                 if (isSideModeEnabled)
                     SetCurrentSideViewLayer(-1);

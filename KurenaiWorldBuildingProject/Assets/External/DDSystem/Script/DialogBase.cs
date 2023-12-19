@@ -125,6 +125,7 @@ namespace Doublsb.Dialog
         //================================================
         //Public Variable
         //================================================
+        public string Name;
         public string Character;
         public List<DialogCommand> Commands = new List<DialogCommand>();
         public DialogSelect SelectList = new DialogSelect();
@@ -139,13 +140,14 @@ namespace Doublsb.Dialog
         //================================================
         //Public Method
         //================================================
-        public DialogData(string originalString, string character = "", UnityAction callback = null, bool isSkipable = true)
+        public DialogData(string originalString, string character = "", string name = "", UnityAction callback = null, bool isSkipable = true)
         {
             _convert(originalString);
 
             this.isSkippable = isSkipable;
             this.Callback = callback;
             this.Character = character;
+            this.Name = name;
         }
 
         public static List<DialogData> Load(string dataPath)
@@ -387,9 +389,9 @@ namespace Doublsb.Dialog
             ItemList.Clear();
         }
 
-        public void Add(string Key, string Value, string Audio = "", bool ZoomIn = true)
+        public void Add(string Key, string Value, string Name = "", bool ZoomIn = true)
         {
-            ItemList.Add(new DialogSelectItem(Key, Value, Audio, ZoomIn));
+            ItemList.Add(new DialogSelectItem(Key, Value, Name, ZoomIn));
         }
 
         public void Remove(string Key)
@@ -402,9 +404,9 @@ namespace Doublsb.Dialog
 
     public class DialogSelectItem
     {
-        public string Key;
+        public string Key; // Key is the name of the next DialogBranch
         public string Value;
-        public string Audio;
+        public string Name; // Name is the name of the dialog's audio file
         public bool ZoomIn;
 
         public bool isSameKey(string key)
@@ -412,11 +414,11 @@ namespace Doublsb.Dialog
             return Key == key;
         }
 
-        public DialogSelectItem(string key, string value, string audio = "", bool zoomIn = true)
+        public DialogSelectItem(string key, string value, string name = "", bool zoomIn = true)
         {
             this.Key = key;
             this.Value = value;
-            this.Audio = audio;
+            this.Name = name;
             this.ZoomIn = zoomIn;
         }
     }

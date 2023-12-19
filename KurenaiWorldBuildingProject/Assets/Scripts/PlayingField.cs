@@ -49,6 +49,11 @@ public class PlayingField
         return yval * subGridCount.x + xval;
     }
 
+    public int GetSubGridXIndex(Vector2Int pos)
+    {
+        return pos.x / subGridSize.x;
+    }
+
     public GameObject GetCellObjectInSubGrid(int index, Vector2Int cellPos)
     {
         Vector2Int offset = GetSubGrid(index);

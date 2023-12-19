@@ -8,9 +8,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainMenuScene.unity
     guid: ab8b827bfc47a7949ae1fe09e7e84bec
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/GameScene.unity
     guid: 3fc8acdd13e6c734bafef6554d6fdbcd
+  - enabled: 1
+    path: Assets/Scenes/SpeechTestScene.unity
+    guid: 67df457f8976be946bdba865fa51300a
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: f3cd15c2ee9e4de45a6868b8242547d8, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 4775dc1d5642580419216c5f946ee6e5, type: 2}

@@ -411,7 +411,7 @@ namespace DialogCreator
             printerObject.GetComponent<Button>().interactable = true;
             isPreviewing = true;
 
-            dialogManager.OnDialogEndedEvent += OnPreviewDialogEnded;
+            dialogManager.OnDialogBranchEndedEvent += OnPreviewDialogEnded;
             dialogManager.Show(data);
         }
 
@@ -435,7 +435,7 @@ namespace DialogCreator
             printerObject.GetComponent<Button>().interactable = true;
             isPreviewing = true;
 
-            dialogManager.OnDialogEndedEvent += OnPreviewDialogEnded;
+            dialogManager.OnDialogBranchEndedEvent += OnPreviewDialogEnded;
             dialogManager.Show(data);
         }
 
@@ -502,7 +502,7 @@ namespace DialogCreator
             printerObject.GetComponent<Button>().interactable = false;
             dialogueTextInputField.enabled = true;
 
-            dialogManager.OnDialogEndedEvent -= OnPreviewDialogEnded;
+            dialogManager.OnDialogBranchEndedEvent -= OnPreviewDialogEnded;
 
             printerObject.SetActive(true);
         }

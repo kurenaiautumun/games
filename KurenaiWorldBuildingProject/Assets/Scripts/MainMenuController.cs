@@ -24,7 +24,7 @@ public class MainMenuController : MonoBehaviour
 
     public void Play()
     {
-        transitionManager.Transition("GameScene", transitionType, transitionDelay);
+        transitionManager.Transition("SpeechTestScene", transitionType, transitionDelay);
     }
 
     public void Quit()

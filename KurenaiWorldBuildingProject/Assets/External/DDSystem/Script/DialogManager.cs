@@ -88,6 +88,11 @@ namespace Doublsb.Dialog
                 _emote("Normal");
 
             _textingRoutine = StartCoroutine(Activate());
+
+            if (OnDialogEndedEvent != null)
+            {
+                OnDialogEndedEvent(Data.Name);
+            }
         }
 
         public void Show(List<DialogData> Data)
@@ -149,7 +154,13 @@ namespace Doublsb.Dialog
             Result = _selected_Item.Key;
             OnPrintStartEvent();
             Printer_Text.text = _selected_Item.Value;
-            yield return new WaitForSeconds(Play_CallSE(_selected_Item.Audio));
+
+            if (OnDialogEndedEvent != null)
+            {
+                OnDialogEndedEvent(_current_Data.SelectList.GetByIndex(index).Name);
+            }
+
+            yield return new WaitForSeconds(Play_CallSE(_selected_Item.Name));
             Hide();
         }
 
@@ -172,6 +183,12 @@ namespace Doublsb.Dialog
             {
                 var FindSE
                     = Array.Find(_current_Character.CallSE, (SE) => SE.name == SEname);
+
+                if (FindSE == null)
+                {
+                    Debug.LogError("Audio clip not found: " + SEname);
+                    return 0;
+                }
 
                 CallAudio.clip = FindSE;
                 CallAudio.Play();
@@ -294,8 +311,8 @@ namespace Doublsb.Dialog
                 while (state != State.Deactivate) { yield return null; }
             }
 
-            if (OnDialogEndedEvent != null)
-                OnDialogEndedEvent();
+            if (OnDialogBranchEndedEvent != null)
+                OnDialogBranchEndedEvent();
 
             if (_current_Data.Callback != null)
             {
@@ -409,8 +426,11 @@ namespace Doublsb.Dialog
         public delegate void _printfinisheddelegate();
         public event _printfinisheddelegate OnPrintFinishedEvent;
 
-        public delegate void _dialogendeddelegate();
+        public delegate void _dialogendeddelegate(string name);
         public event _dialogendeddelegate OnDialogEndedEvent;
+
+        public delegate void _dialogbranchendeddelegate();
+        public event _dialogbranchendeddelegate OnDialogBranchEndedEvent;
 
         public GameObject GetCurrentInGameCharacter()
         {

@@ -1,16 +1,10 @@
-#if (UNITY_EDITOR)
-
 using Doublsb.Dialog;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEditor;
-using UnityEditor.PackageManager.UI;
-using static UnityEditor.Progress;
 
 #region UNITYEDITOR
-
+#if (UNITY_EDITOR)
 [CustomEditor(typeof(speechTestScript))]
 public class speechTestEditor : Editor
 {
@@ -75,15 +69,18 @@ public class speechTestEditor : Editor
         }
     }
 }
-
+#endif
 #endregion
 
 public class speechTestScript : MonoBehaviour
 {
     public bool testSpeechOnStart = true;
+    public GameObject mapControlPanel;
+    public GameManagerController gameManagerController;
     // Remember to get a reference to the extended variant for speech bubbles
     private ExtendedDialogManager dialogManager;
     private GameObject charactersContainer;
+    private bool dialogInProgress = false;
 
     private void Start()
     {
@@ -91,6 +88,46 @@ public class speechTestScript : MonoBehaviour
         charactersContainer = dialogManager.gameObject.transform.Find("Characters").gameObject;
         if (testSpeechOnStart)
             TestSpeechFromJson();
+
+        gameManagerController = GameObject.Find("GameManager")?.GetComponent<GameManagerController>();
+
+        int characterCount = 0;
+        int gridIdx = 0;
+
+        // This test scenario only works when the cook is placed first and the girl is placed next. They have to be the only two characters in the scene
+        gameManagerController.OnObjectPlacedEvent += (GameObject item) =>
+        {
+            if (item.TryGetComponent<GridObject>(out var component) && component.type == objectType.Character)
+            {
+                characterCount++;
+                if (characterCount == 2 && item.name == "Girl")
+                {
+                    gridIdx = gameManagerController.GetSubGridXIndex(component.gridPosition);
+                    gameManagerController.SwitchViewMode(true);
+                    gameManagerController.SwitchInteractionMode(GridInteractionMode.Select);
+                    gameManagerController.ClearPreviousSubGridView(gameManagerController.sideViewActiveGrid);
+                    gameManagerController.sideViewActiveGrid = gridIdx;
+                    gameManagerController.SetCurrentSubGridView(gridIdx);
+                    mapControlPanel.SetActive(false);
+                    TestSpeechFromJson();
+                }
+            }
+        };
+
+        gameManagerController.OnSubGridChanged += (int grid) =>
+        {
+            if (!dialogInProgress)
+                return;
+
+            if (grid == gridIdx)
+            {
+                dialogManager.SwitchCurrentActiveTalkingCharacter();
+            }
+            else
+            {
+                dialogManager.ResetToOriginalZoom();
+            }
+        };
     }
 
     public void TestSpeech()
@@ -132,7 +169,50 @@ public class speechTestScript : MonoBehaviour
 
     public void TestSpeechFromJson()
     {
+        dialogInProgress = true;
+        dialogManager.UpdateCameraProperties();
+
+        int oldIdx = 0;
+
+        dialogManager.DialogEndedEvent += (string name) =>
+        {
+            Debug.Log("Current dialog that ended: " + name);
+            if (name == "NiceMeetingYouHere")
+            {
+                dialogManager.ResetToOriginalCameraProperties();
+                oldIdx = gameManagerController.sideViewActiveGrid;
+                gameManagerController.ClearPreviousSubGridView(gameManagerController.sideViewActiveGrid);
+                gameManagerController.sideViewActiveGrid = 0;
+                gameManagerController.SetCurrentSubGridView(0);
+            }
+            else if (name == "DoYouLikeCooking")
+            {
+                gameManagerController.ClearPreviousSubGridView(gameManagerController.sideViewActiveGrid);
+                gameManagerController.sideViewActiveGrid = oldIdx;
+                gameManagerController.SetCurrentSubGridView(oldIdx);
+                dialogManager.SwitchCurrentActiveTalkingCharacter();
+            }
+        };
+
         dialogManager.LoadFromJson("Dialogs/Dialog");
+
+        dialogManager.DialogBranchEndedEvent += (string name) =>
+        {
+            if (name == "False" || name == "Neutral" || name == "True")
+            {
+                FinishDialogs();
+            }
+        };
+    }
+
+    private void FinishDialogs()
+    {
+        dialogInProgress = false;
+        mapControlPanel.SetActive(true);
+        gameManagerController.gameObject.SetActive(true);
+        gameManagerController.SwitchViewMode();
+        Camera.main.GetComponent<CameraController>().enabled = true;
+        dialogManager.transform.GetChild(0).gameObject.SetActive(false);
     }
 
     public void TestDialog(string dialog, string character)
@@ -297,5 +377,3 @@ public class speechTestScript : MonoBehaviour
     }
 }
 */
-
-#endif

@@ -1,5 +1,3 @@
-#if (UNITY_EDITOR)
-
 // This is an extension built on top of the other Dialog Manager
 // This manager is aimed for dialogs with speech bubbles while the other is more RPG oriented (print on the bottom)
 // This asset is designed to be as close as possible to the original in order to preserve as many functionalities that are currently present
@@ -15,7 +13,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 #region UNITYEDITOR
-
+#if (UNITY_EDITOR)
 [CustomEditor(typeof(ExtendedDialogManager))]
 public class ExtendedDialogManagerEditor : Editor
 {
@@ -55,7 +53,7 @@ public class ExtendedDialogManagerEditor : Editor
         }
     }
 }
-
+#endif
 #endregion
 
 public class ExtendedDialogManager : MonoBehaviour
@@ -75,11 +73,12 @@ public class ExtendedDialogManager : MonoBehaviour
     public GameObject charactersContainer;
 
     public string Result => dialogManager.Result;
+    public string currentDialogBranch;
 
     private class DialogSelectItem
     {
-        public string Key;
-        public string Audio;
+        public string Name;
+        public string BranchName;
         public string Dialog;
         public bool ZoomIn;
     }
@@ -87,7 +86,7 @@ public class ExtendedDialogManager : MonoBehaviour
     private class DialogItem
     {
         public string Character;
-        public string Audio;
+        public string Name;
         public string Dialog;
         public string ZoomIn;
         public string SelectCharacter;
@@ -106,10 +105,9 @@ public class ExtendedDialogManager : MonoBehaviour
 
         dialogManager = GetComponent<DialogManager>();
 
-        originalZoom = Camera.main.orthographicSize;
-        originalCameraPosition = Camera.main.transform.position;
+        UpdateCameraProperties();
 
-        if (dialogManager != null )
+        if (dialogManager != null)
             isInitialized = true;
     }
 
@@ -123,14 +121,17 @@ public class ExtendedDialogManager : MonoBehaviour
     {
         dialogManager.OnPrintStartEvent += SwitchCurrentActiveTalkingCharacter;
         dialogManager.OnDialogEndedEvent += FinishedDialog;
+        dialogManager.OnDialogBranchEndedEvent += FinishedDialogBranch;
 
         dialogManager.Show(Data);
     }
 
-    public void Show(List<DialogData> Data)
+    public void Show(List<DialogData> Data, string branchName = "")
     {
+        currentDialogBranch = branchName;
         dialogManager.OnPrintStartEvent += SwitchCurrentActiveTalkingCharacter;
         dialogManager.OnDialogEndedEvent += FinishedDialog;
+        dialogManager.OnDialogBranchEndedEvent += FinishedDialogBranch;
 
         dialogManager.Show(Data);
     }
@@ -150,7 +151,7 @@ public class ExtendedDialogManager : MonoBehaviour
         zoomInOnCharacters = zoomIn;
     }
 
-    public void LoadFromJson(string dataPath)
+    public void LoadFromJson(string dataPath, string branchName = null)
     {
         try
         {
@@ -164,10 +165,10 @@ public class ExtendedDialogManager : MonoBehaviour
                 List<DialogData> dialogs = new List<DialogData>();
                 foreach (DialogItem jsonDialog in item.Dialogs)
                 {
-                    DialogData dialogData = new DialogData(jsonDialog.Dialog, jsonDialog.Character);
-                    if (jsonDialog.Audio != null)
+                    DialogData dialogData = new DialogData(jsonDialog.Dialog, jsonDialog.Character, jsonDialog.Name);
+                    if (jsonDialog.Name != null)
                     {
-                        dialogData.Commands.Insert(0, new DialogCommand(Command.sound, jsonDialog.Audio));
+                        dialogData.Commands.Insert(0, new DialogCommand(Command.sound, jsonDialog.Name));
                     }
 
                     if (jsonDialog.ZoomIn != null)
@@ -183,18 +184,18 @@ public class ExtendedDialogManager : MonoBehaviour
 
                             foreach (DialogSelectItem selectOption in jsonDialog.SelectList)
                             {
-                                dialogData.SelectList.Add(selectOption.Key, selectOption.Dialog, selectOption.Audio, selectOption.ZoomIn);
+                                dialogData.SelectList.Add(selectOption.BranchName, selectOption.Dialog, selectOption.Name, selectOption.ZoomIn);
                             }
 
                             dialogData.Callback = () =>
                             {
                                 if (data.TryGetValue(Result, out List<DialogData> dialogItems))
                                 {
-                                    Show(dialogItems);
+                                    Show(dialogItems, Result);
                                 }
                                 else
                                 {
-                                    LoadFromJson(dataPath.Substring(0, dataPath.LastIndexOf('/') + 1) + Result);
+                                    LoadFromJson(dataPath.Substring(0, dataPath.LastIndexOf('/') + 1) + Result, Result);
                                 }
                             };
                         }
@@ -205,36 +206,38 @@ public class ExtendedDialogManager : MonoBehaviour
                 data.Add(item.Name, dialogs);
             }
 
-            Show(data["Main"]);
-        } catch(System.Exception e)
+            Show(data["Main"], branchName ?? "Main");
+        }
+        catch (System.Exception e)
         {
             Debug.LogError("Exception: " + e.Message);
         }
     }
 
-    //================================================
-    //Private Methods
-    //================================================
-
-    private void FinishedDialog()
+    public void UpdateCameraProperties()
     {
-        // Unhook the functions from the events
-        dialogManager.OnPrintStartEvent -= SwitchCurrentActiveTalkingCharacter;
-        dialogManager.OnDialogEndedEvent -= FinishedDialog;
-
-        // Fix the camera zoom and position
-        if(dialogManager.ZoomInOnCurrentCharacter())
-        {
-            Camera.main.orthographicSize = originalZoom;
-            Camera.main.transform.position = originalCameraPosition;
-        }
+        originalZoom = Camera.main.orthographicSize;
+        originalCameraPosition = Camera.main.transform.position;
     }
 
-    private void SwitchCurrentActiveTalkingCharacter()
+    public void ResetToOriginalCameraProperties()
+    {
+        Camera.main.orthographicSize = originalZoom;
+        Camera.main.transform.position = originalCameraPosition;
+    }
+
+    public void ResetToOriginalZoom()
+    {
+        Camera.main.orthographicSize = originalZoom;
+    }
+
+    public void SwitchCurrentActiveTalkingCharacter()
     {
         // Get the current talking character
         currentTalkingCharacter = dialogManager.GetCurrentInGameCharacter();
-        var characterPos = currentTalkingCharacter.transform.GetChild(0).position;
+
+        GameManagerController gameManagerController = GameObject.Find("GameManager")?.GetComponent<GameManagerController>();
+        var characterPos = gameManagerController?.isSideModeEnabled ?? false ? currentTalkingCharacter.transform.position : currentTalkingCharacter.GetComponent<GridObject>().altViewObject.transform.position;
 
         // Find the mouth position if it exists
         var mouth = currentTalkingCharacter.transform.Find("Mouth");
@@ -246,15 +249,49 @@ public class ExtendedDialogManager : MonoBehaviour
         {
             Camera.main.orthographicSize = originalZoom / zoomFactor;
             Camera.main.transform.position = new Vector3(characterPos.x, characterPos.y, Camera.main.transform.position.z);
-        } else
+        }
+        else
         {
             if (Camera.main.orthographicSize != originalZoom || Camera.main.transform.position != originalCameraPosition)
             {
-                Camera.main.orthographicSize = originalZoom;
-                Camera.main.transform.position = originalCameraPosition;
+                ResetToOriginalCameraProperties();
             }
         }
     }
-}
 
-#endif
+    public delegate void _dialogendeddelegate(string name);
+    public event _dialogendeddelegate DialogEndedEvent;
+
+    public delegate void _dialogbranchendeddelegate(string name);
+    public event _dialogbranchendeddelegate DialogBranchEndedEvent;
+
+    //================================================
+    //Private Methods
+    //================================================
+
+    private void FinishedDialog(string name)
+    {
+        if (DialogEndedEvent != null)
+            DialogEndedEvent(name);
+    }
+
+    private void FinishedDialogBranch()
+    {
+        if (currentDialogBranch != "" && DialogBranchEndedEvent != null)
+        {
+            DialogBranchEndedEvent(currentDialogBranch);
+        }
+        currentDialogBranch = "";
+        // Unhook the functions from the events
+        dialogManager.OnPrintStartEvent -= SwitchCurrentActiveTalkingCharacter;
+        dialogManager.OnDialogEndedEvent -= FinishedDialog;
+        dialogManager.OnDialogBranchEndedEvent -= FinishedDialogBranch;
+
+        // Fix the camera zoom and position
+        if (dialogManager.ZoomInOnCurrentCharacter())
+        {
+            Camera.main.orthographicSize = originalZoom;
+            Camera.main.transform.position = originalCameraPosition;
+        }
+    }
+}

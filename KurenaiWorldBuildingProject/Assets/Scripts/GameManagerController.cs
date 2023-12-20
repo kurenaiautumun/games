@@ -226,6 +226,10 @@ public class GameManagerController : MonoBehaviour
         List<RaycastResult> results = new List<RaycastResult>();
         graphicRaycaster.Raycast(pointerEventData, results);
 
+        if (results.Count > 0)
+            return true;
+
+        itemPickerDropdownContainer.GetComponentInChildren<GraphicRaycaster>()?.Raycast(pointerEventData, results);
         return results.Count > 0;
     }
 

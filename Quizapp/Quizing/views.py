@@ -22,13 +22,13 @@ def Profile(request):
         Profile = profile.objects.create(user = user_model,Phone_No = phone_no,name = username,wallet = 0)
         Profile.save()
         
-        userdata = {
-            'username':user_model.username,
-            'number': phone_no
-        }
-        return Response(userdata,status = 201)
+        # userdata = {
+        #     'username':user_model.username,
+        #     'number': phone_no
+        # }
+        return Response(status = 201)
     
-    
+     
 @api_view(['POST'])
 def Wallet_Update(request):
     if request.method=='POST':
@@ -37,12 +37,15 @@ def Wallet_Update(request):
         
         update_profile = profile.objects.filter(Phone_No=ph_number).first()
         
-        update_profile.wallet = wallet
+        if wallet:
+            update_profile.wallet = wallet
         
         update_profile.save()
         
         data = {
-            'wallet':wallet
+            'name':update_profile.name,
+            'ph_number':update_profile.Phone_No,
+            'wallet':update_profile.wallet
         }
         
         return Response(data,status = 200)

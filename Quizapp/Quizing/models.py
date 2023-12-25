@@ -6,7 +6,7 @@ class profile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=50)
     Phone_No = models.CharField(max_length = 15)
-    wallet = models.BigIntegerField()
+    wallet = models.CharField(max_length=50)
 
     def __str__(self):
         return self.user.username if self.user else 'No User'

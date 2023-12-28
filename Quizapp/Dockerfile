@@ -11,6 +11,5 @@ COPY . .
 RUN adduser --disabled-password --gecos '' myuser
 USER myuser
 
-EXPOSE 8000
 
 CMD ["python", "manage.py", "runserver"]

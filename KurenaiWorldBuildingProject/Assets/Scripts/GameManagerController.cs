@@ -129,7 +129,6 @@ public class GameManagerController : MonoBehaviour
 
     private Vector2 previousTouchLocation;
     private bool hasInputTouchDragged;
-    private bool hasInputTouchOverUI;
     private bool isGamePaused;
     public string baseSavePath;
     private string baseScreenshotPath;
@@ -156,7 +155,6 @@ public class GameManagerController : MonoBehaviour
         transitionManager = TransitionManager.Instance();
 
         hasInputTouchDragged = false;
-        hasInputTouchOverUI = false;
         isSideModeEnabled = false;
 
         topDownViewCameraPos = Camera.main.transform.position;
@@ -249,18 +247,25 @@ public class GameManagerController : MonoBehaviour
         SetHighlight(touchPosition, gridInteractionMode == GridInteractionMode.Place);
         hasInputTouchDragged = true;
 
+        Vector2 oldDisplacement = origin - (Camera.main.ScreenToWorldPoint(touchPosition) - Camera.main.transform.position);
+        bool hasCameraMoved = false;
         while (hasInputTouchDragged)
         {
             // Dragging
+            Vector2 displacement = origin - (Camera.main.ScreenToWorldPoint(touchPosition) - Camera.main.transform.position);
 
-            difference = Camera.main.ScreenToWorldPoint(touchPosition) - Camera.main.transform.position;
-            MoveCamera(origin - difference);
+            if ((displacement - oldDisplacement).magnitude > 0)
+            {
+                hasCameraMoved = true;
+            }
+
+            MoveCamera(displacement);
+            oldDisplacement = displacement;
             yield return null;
         }
 
         //Drag finished
-
-        if (!hasInputTouchDragged)
+        if (!hasInputTouchDragged && !hasCameraMoved)
         {
             var touchScreenPos = touchPosition;
             var touchWorldPos = Camera.main.ScreenToWorldPoint(touchScreenPos);
@@ -317,7 +322,6 @@ public class GameManagerController : MonoBehaviour
                     Debug.Log(gridPos);
             }
         }
-        hasInputTouchOverUI = false;
         hasInputTouchDragged = false;
     }
 

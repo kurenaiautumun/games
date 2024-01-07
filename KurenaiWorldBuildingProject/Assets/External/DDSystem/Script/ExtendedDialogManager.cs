@@ -151,11 +151,11 @@ public class ExtendedDialogManager : MonoBehaviour
         zoomInOnCharacters = zoomIn;
     }
 
-    public void LoadFromJson(string dataPath, string branchName = null)
+    public List<DialogData> LoadFromJson(string dataPath, string branchName = null)
     {
+        Dictionary<string, List<DialogData>> data = new Dictionary<string, List<DialogData>>();
         try
         {
-            Dictionary<string, List<DialogData>> data = new Dictionary<string, List<DialogData>>();
 
             string json = ((TextAsset)Resources.Load(dataPath)).text;
             List<DialogBranch> items = JsonConvert.DeserializeObject<List<DialogBranch>>(json);
@@ -195,7 +195,7 @@ public class ExtendedDialogManager : MonoBehaviour
                                 }
                                 else
                                 {
-                                    LoadFromJson(dataPath.Substring(0, dataPath.LastIndexOf('/') + 1) + Result, Result);
+                                    Show(LoadFromJson(dataPath.Substring(0, dataPath.LastIndexOf('/') + 1) + Result), Result);
                                 }
                             };
                         }
@@ -205,13 +205,18 @@ public class ExtendedDialogManager : MonoBehaviour
                 }
                 data.Add(item.Name, dialogs);
             }
-
-            Show(data["Main"], branchName ?? "Main");
         }
         catch (System.Exception e)
         {
             Debug.LogError("Exception: " + e.Message);
         }
+
+        if (data.TryGetValue("Main", out List<DialogData> dialogItems))
+        {
+            return dialogItems;
+        }
+
+        return new List<DialogData>();
     }
 
     public void UpdateCameraProperties()

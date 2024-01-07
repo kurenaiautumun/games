@@ -460,7 +460,7 @@ public class GameManagerController : MonoBehaviour
     }
 
     // Place selected item into both top view and side view (separate GameObjects but linked via GridObject)
-    private void PlaceObjectInWorld(Vector3 gridPos, GameObject item = null)
+    public void PlaceObjectInWorld(Vector3 gridPos, GameObject item = null)
     {
         if (item == null)
             item = itemPickerDropdownContainer.GetComponent<ItemPickerController>().GetItem();

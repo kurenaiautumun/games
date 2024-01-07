@@ -77,10 +77,15 @@ public class speechTestScript : MonoBehaviour
     public bool testSpeechOnStart = true;
     public GameObject mapControlPanel;
     public GameManagerController gameManagerController;
+
+    public GameObject cookCharacter, girlCharacter;
     // Remember to get a reference to the extended variant for speech bubbles
     private ExtendedDialogManager dialogManager;
     private GameObject charactersContainer;
     private bool dialogInProgress = false;
+    private int gridIdxToPlaceCharacters = 1; // Make sure that characters are placed in this grid index
+
+    List<DialogData> dialogDatas;
 
     private void Start()
     {
@@ -91,35 +96,12 @@ public class speechTestScript : MonoBehaviour
 
         gameManagerController = GameObject.Find("GameManager")?.GetComponent<GameManagerController>();
 
-        int characterCount = 0;
-        int gridIdx = 0;
-
-        // This test scenario only works when the cook is placed first and the girl is placed next. They have to be the only two characters in the scene
-        gameManagerController.OnObjectPlacedEvent += (GameObject item) =>
-        {
-            if (item.TryGetComponent<GridObject>(out var component) && component.type == objectType.Character)
-            {
-                characterCount++;
-                if (characterCount == 2 && item.name == "Girl")
-                {
-                    gridIdx = gameManagerController.GetSubGridXIndex(component.gridPosition);
-                    gameManagerController.SwitchViewMode(true);
-                    gameManagerController.SwitchInteractionMode(GridInteractionMode.Select);
-                    gameManagerController.ClearPreviousSubGridView(gameManagerController.sideViewActiveGrid);
-                    gameManagerController.sideViewActiveGrid = gridIdx;
-                    gameManagerController.SetCurrentSubGridView(gridIdx);
-                    mapControlPanel.SetActive(false);
-                    TestSpeechFromJson();
-                }
-            }
-        };
-
         gameManagerController.OnSubGridChanged += (int grid) =>
         {
             if (!dialogInProgress)
                 return;
 
-            if (grid == gridIdx)
+            if (grid == gridIdxToPlaceCharacters)
             {
                 dialogManager.SwitchCurrentActiveTalkingCharacter();
             }
@@ -128,6 +110,8 @@ public class speechTestScript : MonoBehaviour
                 dialogManager.ResetToOriginalZoom();
             }
         };
+
+        dialogDatas = dialogManager.LoadFromJson("Dialogs/Dialog");
     }
 
     public void TestSpeech()
@@ -169,11 +153,19 @@ public class speechTestScript : MonoBehaviour
 
     public void TestSpeechFromJson()
     {
+        gameManagerController.PlaceObjectInWorld(new Vector3(-1, 0, 0), cookCharacter);
+        gameManagerController.PlaceObjectInWorld(new Vector3(0, 0, 0), girlCharacter);
+        gameManagerController.SwitchViewMode(true);
+        gameManagerController.SwitchInteractionMode(GridInteractionMode.Select);
+        gameManagerController.ClearPreviousSubGridView(gameManagerController.sideViewActiveGrid);
+        gameManagerController.sideViewActiveGrid = gridIdxToPlaceCharacters;
+        gameManagerController.SetCurrentSubGridView(gridIdxToPlaceCharacters);
+        mapControlPanel.SetActive(false);
+
         dialogInProgress = true;
         dialogManager.UpdateCameraProperties();
 
         int oldIdx = 0;
-
         dialogManager.DialogEndedEvent += (string name) =>
         {
             Debug.Log("Current dialog that ended: " + name);
@@ -194,7 +186,7 @@ public class speechTestScript : MonoBehaviour
             }
         };
 
-        dialogManager.LoadFromJson("Dialogs/Dialog");
+        dialogManager.Show(dialogDatas, "Main");
 
         dialogManager.DialogBranchEndedEvent += (string name) =>
         {

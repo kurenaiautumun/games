@@ -1,0 +1,949 @@
+fileFormatVersion: 2
+guid: 69eaae7e5c2bbaa478a2e10104f566e4
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2945803195536954342
+    second: noun-one-person-349790_0
+  - first:
+      213: 3641898844259939814
+    second: noun-one-person-349790_1
+  - first:
+      213: 7098792356344442870
+    second: noun-one-person-349790_2
+  - first:
+      213: -7438608208209591402
+    second: noun-one-person-349790_3
+  - first:
+      213: -6960877095801788540
+    second: noun-one-person-349790_4
+  - first:
+      213: 4949736384001272707
+    second: noun-one-person-349790_5
+  - first:
+      213: 3288442475843851423
+    second: noun-one-person-349790_6
+  - first:
+      213: -4555761768032179977
+    second: noun-one-person-349790_7
+  - first:
+      213: -539341121091329638
+    second: noun-one-person-349790_8
+  - first:
+      213: -3670225242097462975
+    second: noun-one-person-349790_9
+  - first:
+      213: -7918158294224674419
+    second: noun-one-person-349790_10
+  - first:
+      213: -3629511737262969707
+    second: noun-one-person-349790_11
+  - first:
+      213: -4951317792654250857
+    second: noun-one-person-349790_12
+  - first:
+      213: 2151677732367326652
+    second: noun-one-person-349790_13
+  - first:
+      213: -7937514203068906078
+    second: noun-one-person-349790_14
+  - first:
+      213: -7935617006898634501
+    second: noun-one-person-349790_15
+  - first:
+      213: 7391406419429891957
+    second: noun-one-person-349790_16
+  - first:
+      213: -7353571049996870528
+    second: noun-one-person-349790_17
+  - first:
+      213: 8901336893713619517
+    second: noun-one-person-349790_18
+  - first:
+      213: 4510126871233533023
+    second: noun-one-person-349790_19
+  - first:
+      213: -5919904198888044271
+    second: noun-one-person-349790_20
+  - first:
+      213: -3588324871867829368
+    second: noun-one-person-349790_21
+  - first:
+      213: -592784758199912789
+    second: noun-one-person-349790_22
+  - first:
+      213: -7319574855143212285
+    second: noun-one-person-349790_23
+  - first:
+      213: -4866122240528730149
+    second: noun-one-person-349790_24
+  - first:
+      213: 4865906511185076797
+    second: noun-one-person-349790_25
+  - first:
+      213: 5542342357076957303
+    second: noun-one-person-349790_26
+  - first:
+      213: 170491867026258793
+    second: noun-one-person-349790_27
+  - first:
+      213: 4063033356336860489
+    second: noun-one-person-349790_28
+  - first:
+      213: -6687944370288287642
+    second: noun-one-person-349790_29
+  - first:
+      213: 2964093324408520079
+    second: noun-one-person-349790_30
+  - first:
+      213: 8972041825802969012
+    second: noun-one-person-349790_31
+  - first:
+      213: 5592126410153179510
+    second: noun-one-person-349790_32
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: noun-one-person-349790_0
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 99
+        width: 602
+        height: 601
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e3d038166891e820800000000000000
+      internalID: 2945803195536954342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_1
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 67
+        width: 18
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e5f40804bf9a8230800000000000000
+      internalID: 3641898844259939814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_2
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 67
+        width: 23
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ff2b2e790af38260800000000000000
+      internalID: 7098792356344442870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_3
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 67
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 693cc5efe31c4c890800000000000000
+      internalID: -7438608208209591402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_4
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 67
+        width: 10
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 487e493692ff56f90800000000000000
+      internalID: -6960877095801788540
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_5
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 67
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38be834340ff0b440800000000000000
+      internalID: 4949736384001272707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_6
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 67
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f949af44205e2ad20800000000000000
+      internalID: 3288442475843851423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_7
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 67
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f8e2273fcea6c0c0800000000000000
+      internalID: -4555761768032179977
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_8
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 62
+        width: 16
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a912790ab10e388f0800000000000000
+      internalID: -539341121091329638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_9
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 67
+        width: 21
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 141db17869db01dc0800000000000000
+      internalID: -3670225242097462975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_10
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 67
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d81ec6dcbfc0d1290800000000000000
+      internalID: -7918158294224674419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_11
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 67
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59c64501e4261adc0800000000000000
+      internalID: -3629511737262969707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_12
+      rect:
+        serializedVersion: 2
+        x: 236
+        y: 67
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79ca5c663b2694bb0800000000000000
+      internalID: -4951317792654250857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_13
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 67
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbd5fdc5f7b4cdd10800000000000000
+      internalID: 2151677732367326652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_14
+      rect:
+        serializedVersion: 2
+        x: 273
+        y: 62
+        width: 16
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a5c57613e848d190800000000000000
+      internalID: -7937514203068906078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_15
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 67
+        width: 25
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf0224e70660fd190800000000000000
+      internalID: -7935617006898634501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_16
+      rect:
+        serializedVersion: 2
+        x: 318
+        y: 67
+        width: 10
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57f19a42afc839660800000000000000
+      internalID: 7391406419429891957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_17
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 67
+        width: 23
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08c1756471ed2f990800000000000000
+      internalID: -7353571049996870528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_18
+      rect:
+        serializedVersion: 2
+        x: 349
+        y: 67
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3a11e75eb6e78b70800000000000000
+      internalID: 8901336893713619517
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_19
+      rect:
+        serializedVersion: 2
+        x: 364
+        y: 67
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5491d36e70379e30800000000000000
+      internalID: 4510126871233533023
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_20
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 41
+        width: 10
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1194fe00f7648dda0800000000000000
+      internalID: -5919904198888044271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_21
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 41
+        width: 23
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8837e917a85b33ec0800000000000000
+      internalID: -3588324871867829368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_22
+      rect:
+        serializedVersion: 2
+        x: 82
+        y: 41
+        width: 21
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba67a33376106c7f0800000000000000
+      internalID: -592784758199912789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_23
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 41
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30bbe443375ab6a90800000000000000
+      internalID: -7319574855143212285
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_24
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 41
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd738a3aa9f087cb0800000000000000
+      internalID: -4866122240528730149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_25
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 41
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d326275f03c278340800000000000000
+      internalID: 4865906511185076797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_26
+      rect:
+        serializedVersion: 2
+        x: 157
+        y: 41
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7785c29520b5aec40800000000000000
+      internalID: 5542342357076957303
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_27
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 41
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96b71332375bd5200800000000000000
+      internalID: 170491867026258793
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_28
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 41
+        width: 23
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94d850b8f4bc26830800000000000000
+      internalID: 4063033356336860489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_29
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 36
+        width: 7
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 660a46b8706af23a0800000000000000
+      internalID: -6687944370288287642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_30
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 41
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8df9729c23922920800000000000000
+      internalID: 2964093324408520079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_31
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 41
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4bfdee03188138c70800000000000000
+      internalID: 8972041825802969012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: noun-one-person-349790_32
+      rect:
+        serializedVersion: 2
+        x: 252
+        y: 41
+        width: 10
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 679b24877593b9d40800000000000000
+      internalID: 5592126410153179510
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      noun-one-person-349790_0: 2945803195536954342
+      noun-one-person-349790_1: 3641898844259939814
+      noun-one-person-349790_10: -7918158294224674419
+      noun-one-person-349790_11: -3629511737262969707
+      noun-one-person-349790_12: -4951317792654250857
+      noun-one-person-349790_13: 2151677732367326652
+      noun-one-person-349790_14: -7937514203068906078
+      noun-one-person-349790_15: -7935617006898634501
+      noun-one-person-349790_16: 7391406419429891957
+      noun-one-person-349790_17: -7353571049996870528
+      noun-one-person-349790_18: 8901336893713619517
+      noun-one-person-349790_19: 4510126871233533023
+      noun-one-person-349790_2: 7098792356344442870
+      noun-one-person-349790_20: -5919904198888044271
+      noun-one-person-349790_21: -3588324871867829368
+      noun-one-person-349790_22: -592784758199912789
+      noun-one-person-349790_23: -7319574855143212285
+      noun-one-person-349790_24: -4866122240528730149
+      noun-one-person-349790_25: 4865906511185076797
+      noun-one-person-349790_26: 5542342357076957303
+      noun-one-person-349790_27: 170491867026258793
+      noun-one-person-349790_28: 4063033356336860489
+      noun-one-person-349790_29: -6687944370288287642
+      noun-one-person-349790_3: -7438608208209591402
+      noun-one-person-349790_30: 2964093324408520079
+      noun-one-person-349790_31: 8972041825802969012
+      noun-one-person-349790_32: 5592126410153179510
+      noun-one-person-349790_4: -6960877095801788540
+      noun-one-person-349790_5: 4949736384001272707
+      noun-one-person-349790_6: 3288442475843851423
+      noun-one-person-349790_7: -4555761768032179977
+      noun-one-person-349790_8: -539341121091329638
+      noun-one-person-349790_9: -3670225242097462975
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

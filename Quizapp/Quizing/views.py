@@ -80,8 +80,13 @@ def UpdateScore(request):
 
 @api_view(['GET'])
 def GetRankedList(request):
-    # Assuming you have a Score model with fields 'points', 'user_id', and 'id'
-    scores = Score.objects.order_by('-points', 'id', 'user_id')
+    quiz_name = request.data.get('quizname')
+
+    if not quiz_name:
+        return Response({'error': 'Missing quizname in request body'}, status=400)
+
+    # Assuming you have a Score model with fields 'points', 'user_id', 'id', and 'quizName'
+    scores = Score.objects.filter(quizName=quiz_name).order_by('-points', 'id', 'user_id')
 
     # Create a list of dictionaries containing user information
     user_list = [

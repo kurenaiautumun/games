@@ -12,9 +12,10 @@ class profile(models.Model):
         return self.user.username if self.user else 'No User'
 
 class Score(models.Model):
+    id = models.AutoField(primary_key=True)
     user_id = models.CharField(max_length=255, unique=True)
     points = models.IntegerField(default=0)
-    time_between_points = models.FloatField(default=0)
+    quizName = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.user_id}'s Score"

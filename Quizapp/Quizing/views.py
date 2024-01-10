@@ -58,6 +58,7 @@ def UpdateScore(request):
         user_id = request.data.get('user_id')
         user_score = request.data.get('score')
         quiz_name = request.data.get('quiz_name')
+        userName = request.data.get('name')
 
         if user_id is not None and user_score is not None and quiz_name is not None:
             # Check if the user with the specified quiz name exists
@@ -68,7 +69,8 @@ def UpdateScore(request):
                 new_score = Score.objects.create(
                     user_id=user_id,
                     points=user_score,
-                    quizName=quiz_name
+                    quizName=quiz_name,
+                    name = userName
                 )
 
                 return Response({'score_id': new_score.id}, status=201)
@@ -93,6 +95,7 @@ def GetRankedList(request):
         {
             'user_id': score.user_id,
             'points': score.points,
+            'name' : score.name
         }
         for score in scores
     ]

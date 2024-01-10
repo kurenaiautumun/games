@@ -80,7 +80,7 @@ def UpdateScore(request):
             return Response({'error': 'Invalid input data'}, status=400)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def GetRankedList(request):
     quiz_name = request.data.get('quizname')
 

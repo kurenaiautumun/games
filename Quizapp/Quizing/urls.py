@@ -6,5 +6,6 @@ urlpatterns = [
     path('profile/',views.Profile,name='profile'),
     path('updates/',views.Wallet_Update,name='update'),
     path('updateScore/',views.UpdateScore,name='score'),
-    path('getranklist/',views.GetRankedList,name='RankList')
+    path('getranklist/',views.GetRankedList,name='RankList'),
+    path('getuserrank/',views.GetUserPosition,name='userrank')
 ]

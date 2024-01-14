@@ -17,6 +17,7 @@ class Score(models.Model):
     points = models.IntegerField(default=0)
     quizName = models.CharField(max_length=50,null = True)
     name = models.CharField(max_length=50,blank = True)
+    claim = models.BooleanField(default=False)  # New field
     
     def __str__(self):
         return f"{self.user_id}'s Score"

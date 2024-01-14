@@ -101,3 +101,40 @@ def GetRankedList(request):
     ]
 
     return Response(user_list, status=200)
+
+
+
+@api_view(['POST'])
+def GetUserPosition(request):
+    try:
+        # Get the user_id and quiz_name from the POST data
+        user_id = request.data.get('user_id')
+        quiz_name = request.data.get('quiz_name')
+
+        if not user_id or not quiz_name:
+            return Response({'error': 'Missing user_id or quiz_name in request body'}, status=400)
+
+        # Get the user score for the given user_id and quiz_name
+        user_score = Score.objects.get(user_id=user_id, quizName=quiz_name)
+        
+        # Check if the user has made a claim
+        if not user_score.claim:
+            # Get the list of users for the quiz
+            user_score.claim = True
+            user_score.save()
+            scores = Score.objects.filter(quizName=quiz_name).order_by('-points', 'id', 'user_id')
+            
+            # Find the position of the user in the list
+            user_position = next((index + 1 for index, score in enumerate(scores) if score.user_id == user_id), None)
+            
+            # Return the total size of the list and the user's position
+            return Response({
+                'total_size': len(scores),
+                'user_position': user_position,
+                'claim' : user_score.claim
+            }, status=200)
+        else:
+            # Return null if the claim is true
+            return Response({'message': 'Claim is already made'}, status=200)
+    except Score.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)

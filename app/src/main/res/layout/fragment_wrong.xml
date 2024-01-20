@@ -1,13 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.wrongFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Fragments.wrongFragment"
+    android:background="@color/background_disp">
 
     <TextView
+        android:id="@+id/scienceWrong"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Wrong" />
+        android:layout_height="wrap_content"
+        android:text="Science"
+        android:textColor="@color/textcolor"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="5dp"/>
 
-</FrameLayout>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/sciencecardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/scienceWrong"
+        app:cardCornerRadius="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="5dp"
+        >
+        <ImageView
+            android:id="@+id/scienceImageWrong"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:src="@drawable/sciencelogo"
+            android:scaleType="centerCrop"
+            />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/moviesWrong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Movies"
+        android:textStyle="bold"
+        android:textSize="35sp"
+        android:textColor="@color/textcolor"
+        app:layout_constraintTop_toBottomOf="@id/sciencecardview"
+        />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/moviecardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/moviesWrong"
+        app:cardCornerRadius="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="5dp"
+        >
+
+        <ImageView
+            android:id="@+id/moviesImageWrong"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:src="@drawable/movies"
+            android:scaleType="centerCrop"/>
+    </androidx.cardview.widget.CardView>
+
+
+    <TextView
+        android:id="@+id/GKWrong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="GK"
+        android:textStyle="bold"
+        android:textSize="35sp"
+        android:textColor="@color/textcolor"
+        app:layout_constraintTop_toBottomOf="@id/moviecardview"
+        />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/gkcardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/GKWrong"
+        app:cardCornerRadius="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="5dp"
+        >
+        <ImageView
+            android:id="@+id/GKImageWrong"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:src="@drawable/gklogo"
+            android:scaleType="centerCrop"/>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,19 +19,6 @@ class Result : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_result)
 
-        val missbutton = findViewById<Button>(R.id.miss)
-        val wrongbutton = findViewById<Button>(R.id.wrong)
-        missbutton.setOnClickListener {
-            val intent = Intent(this,Post_Quiz::class.java)
-            intent.putExtra("section","miss")
-            startActivity(intent)
-        }
-
-        wrongbutton.setOnClickListener {
-            val intent = Intent(this,Post_Quiz::class.java)
-            intent.putExtra("section","wrong")
-            startActivity(intent)
-        }
 
 
         MobileAds.initialize(this) {}
@@ -50,6 +37,16 @@ class Result : AppCompatActivity() {
 
         name.text = "Name : "+savedName
         val scoring = intent.getStringExtra("score")
-        score.text = "Score : "+scoring + "/10"
+        val total = intent.getStringExtra("Quescount")
+
+//        Toast.makeText(this,total,Toast.LENGTH_LONG).show()
+        score.text = "Score : "+scoring + "/"+total
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        setResult(RESULT_OK)
+        finish()
+    }
+
 }

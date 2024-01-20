@@ -61,10 +61,13 @@ class Login : AppCompatActivity() {
                     val editor = sharedPreferences.edit()
                     editor.putString("UID",tempuid)
                     editor.putString("name",tempname)
+                    editor.putString("ph_number",mobilNo.text.toString())
                     editor.apply()
+
 
                     val intent = Intent(this@Login,BaseActivity::class.java)
                     startActivity(intent)
+                    finish()
                 } else {
                     // Incorrect password
                     // Handle the error or notify the user

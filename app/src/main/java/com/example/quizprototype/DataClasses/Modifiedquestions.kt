@@ -1,7 +1,7 @@
 package com.example.quizprototype.DataClasses
 
 data class modifiedquestions(
-    val check:Int,
+    var tries:Int,
     val section: String?,
     val question : String?,
     val option1 : String?,

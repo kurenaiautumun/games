@@ -33,30 +33,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/name" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/miss"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/button"
-        android:text="MISSES"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/wrong"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/score" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/wrong"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/button"
-        android:text="WRONG"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/miss"
-        app:layout_constraintTop_toBottomOf="@id/score" />
-
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adViewResult"
         android:layout_width="wrap_content"

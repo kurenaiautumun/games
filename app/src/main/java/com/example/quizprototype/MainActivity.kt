@@ -1,5 +1,7 @@
 package com.example.quizprototype
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var mAdView : AdView
     val storage = FirebaseStorage.getInstance()
     val storageReference = storage.reference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

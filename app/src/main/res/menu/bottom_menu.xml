@@ -5,9 +5,12 @@
         android:title="Home"
         android:icon="@drawable/baseline_home_24"/>
     <item android:id="@+id/Bottom_misses"
-        android:title="misses"
+        android:title="Misses"
         android:icon="@drawable/baseline_remove_red_eye_24"/>
     <item android:id="@+id/Bottom_wrong"
-        android:title="wrong"
+        android:title="Wrong"
         android:icon="@drawable/baseline_clear_24"/>
+    <item android:id="@+id/profile"
+        android:title="Profile"
+        android:icon="@drawable/baseline_person_24"/>
 </menu>

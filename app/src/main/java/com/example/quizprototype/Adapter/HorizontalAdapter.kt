@@ -2,6 +2,7 @@ package com.example.quizprototype.Adapter
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import java.util.*
 class HorizontalAdapter(private val context: Context, private val items: List<Science>, private val category:String) :
     RecyclerView.Adapter<HorizontalAdapter.ViewHolder>() {
 
+
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageView)
         var name = itemView.findViewById<TextView>(R.id.textView)
@@ -29,6 +31,9 @@ class HorizontalAdapter(private val context: Context, private val items: List<Sc
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
+
+
         val item = items[position]
 
         val modifiedname = item.name.substringBefore(".")
@@ -40,6 +45,12 @@ class HorizontalAdapter(private val context: Context, private val items: List<Sc
 
 
         holder.itemView.setOnClickListener{
+
+//            val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+//            val editor = sharedPreferences.edit()
+//            editor.putString("lastSection",category)
+//            editor.apply()
+
             val intent = Intent(context, Quizing::class.java)
             intent.putExtra("category",category)
             intent.putExtra("underSection",modifiedname)

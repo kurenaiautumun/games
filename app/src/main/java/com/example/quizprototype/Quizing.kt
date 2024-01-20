@@ -8,18 +8,18 @@ import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Button
-import android.widget.RadioButton
-import android.widget.RadioGroup
-import android.widget.TextView
+import android.widget.*
 import com.example.quizprototype.DataClasses.Questions
 import com.example.quizprototype.DataClasses.modifiedquestions
+import com.example.quizprototype.DataClasses.storedSubsection
+import com.example.quizprototype.DataClasses.stored_modifiedquestions
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.*
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.util.*
 
 class Quizing : AppCompatActivity() {
@@ -37,6 +37,13 @@ class Quizing : AppCompatActivity() {
     private lateinit var questionList : MutableList<Questions>
     private lateinit var misslist : MutableList<modifiedquestions>
     private lateinit var Wronglist:MutableList<modifiedquestions>
+    private lateinit var category: String
+    private lateinit var subcategory : String
+    private lateinit var storedModifiedquestionslist: MutableList<stored_modifiedquestions>
+    private lateinit var newQuestionsListMiss : MutableList<modifiedquestions>
+    private lateinit var newQuestionsListWrong : MutableList<modifiedquestions>
+    private var questionFoundMiss = 0
+    private var questionFoundWrong = 0
 
     private var currentQuestionIndex = 0
     private var score = 0
@@ -65,6 +72,7 @@ class Quizing : AppCompatActivity() {
         questionList = mutableListOf()
         misslist = mutableListOf()
         Wronglist = mutableListOf()
+        storedModifiedquestionslist = mutableListOf()
 
         MobileAds.initialize(this) {}
         FirebaseApp.initializeApp(this)
@@ -89,11 +97,46 @@ class Quizing : AppCompatActivity() {
             }
         })
 
+        category = intent.getStringExtra("category").toString()
+        subcategory = intent.getStringExtra("underSection").toString()
+
+        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val jsonW = sharedPreferences.getString("wrong", "")
+        val jsonM = sharedPreferences.getString("miss", "")
+        val storedListType = object : TypeToken<List<stored_modifiedquestions>>() {}.type
+        var storedListWrong: List<stored_modifiedquestions> = gson.fromJson(jsonW, storedListType) ?: emptyList()
+        var storedListMiss: List<stored_modifiedquestions> = gson.fromJson(jsonM, storedListType) ?: emptyList()
+
+        val existingSectionIndexMiss = storedListMiss.indexOfFirst { it.title == category }
+        val existingSectionIndexWrong = storedListWrong.indexOfFirst { it.title == category }
+        newQuestionsListMiss = mutableListOf()
+        newQuestionsListWrong = mutableListOf()
+
+        val uniqueQuestionsSet = HashSet<String>()
+
+        if(existingSectionIndexMiss!=-1){
+            for (question in storedListMiss[existingSectionIndexMiss].subsections.toMutableList()) {
+                if (uniqueQuestionsSet.add(question.question.toString())) {
+                    // Only add if the question is not already in the set
+                    newQuestionsListMiss.add(question)
+                }
+            }
+        }
+        if(existingSectionIndexWrong!=-1){
+            for (question in storedListWrong[existingSectionIndexWrong].subsections.toMutableList()) {
+                if (uniqueQuestionsSet.add(question.question.toString())) {
+                    // Only add if the question is not already in the set
+                    newQuestionsListWrong.add(question)
+                }
+            }
+        }
 
 
-        val category = intent.getStringExtra("category")
-        val subcategory = intent.getStringExtra("underSection")
+
+
         questionList = set_questions(category, subcategory!!)
+
 
 
         submitButton.setOnClickListener {
@@ -245,9 +288,15 @@ class Quizing : AppCompatActivity() {
     private fun processing_question(category: String?) {
 
             timer?.cancel()
+
+
+//        Log.d("newlist",newQuestionsList.toString())
+
             val selectedRadioButtonId = optionsRadioGroup.checkedRadioButtonId
             currentQuestionIndex++
             val question_object = questionList[currentQuestionIndex-1]
+            questionFoundMiss = newQuestionsListMiss.indexOfFirst{ it.question==question_object.question }
+            questionFoundWrong = newQuestionsListWrong.indexOfFirst { it.question==question_object.question }
             if (selectedRadioButtonId != -1) {
                 val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
                 val selectedAnswer = selectedRadioButton.text.toString()
@@ -256,18 +305,45 @@ class Quizing : AppCompatActivity() {
                     result.text = "Correct Answer"
                     result.setTextColor(getColor(R.color.Correct))
                     score++
+
+
+
+                    if(questionFoundMiss!=-1){
+//                        Toast.makeText(this@Quizing,newQuestionsListMiss[questionFoundMiss].tries.toString(),Toast.LENGTH_LONG).show()
+                        newQuestionsListMiss[questionFoundMiss].tries-=1
+//                        Toast.makeText(this@Quizing,newQuestionsListMiss[questionFoundMiss].tries.toString(),Toast.LENGTH_LONG).show()
+
+                    }
+                    else if(questionFoundWrong!=-1){
+                        newQuestionsListWrong[questionFoundWrong].tries-=1
+                    }
                 }
                 else {
                     result.text = "Wrong Answer"
                     result.setTextColor(getColor(R.color.Incorrect))
 
 //                    Log.d("test",question_object.question.toString())
-                    Wronglist.add(modifiedquestions(2,category,question_object.question,question_object.option1,question_object.option2,question_object.option3,question_object.Option4,question_object.answer))
+
+
+                    if(questionFoundWrong!=-1){
+                        newQuestionsListWrong[questionFoundWrong].tries+=1
+                    }
+                    else{
+//                        Toast.makeText(this@Quizing,"hello",Toast.LENGTH_LONG).show()
+                    Wronglist.add(modifiedquestions(3,category,question_object.question,question_object.option1,question_object.option2,question_object.option3,question_object.Option4,question_object.answer))
+                    }
                 }
 
             } else {
                 // No answer selected
-                misslist.add(modifiedquestions(0,category,question_object.question,question_object.option1,question_object.option2,question_object.option3,question_object.Option4,question_object.answer))
+
+                if(questionFoundMiss!=-1){
+//                    Toast.makeText(this@Quizing,"hel",Toast.LENGTH_LONG).show()
+                    newQuestionsListMiss[questionFoundMiss].tries+=1
+                }
+                else{
+                misslist.add(modifiedquestions(3,category,question_object.question,question_object.option1,question_object.option2,question_object.option3,question_object.Option4,question_object.answer))
+                }
                 result.text = "Wrong Answer"
                 result.setTextColor(getColor(R.color.Incorrect))
 
@@ -275,21 +351,27 @@ class Quizing : AppCompatActivity() {
 
 
 
+
+
+
         if(currentQuestionIndex<questionList.size){
 
+            if(questionFoundMiss!=-1)
+                Log.d("question",newQuestionsListMiss.toString())
             handler.postDelayed({
                 display_Question()
 //                startTimer(10)
-            }, 500) // Delay for 0.5 seconds (500 milliseconds)
+            }, 500)
 
         }
         else{
-
-            saveData(Wronglist,"wrong")
-            saveData(misslist,"miss")
+//            saveData(Wronglist,"wrong",newQuestionsListWrong)
+//            Toast.makeText(this,newQuestionsListMiss.toString(),Toast.LENGTH_LONG).show()
+//            Log.d("newlist1",newQuestionsListMiss.toString())
+            saveData(misslist,"miss",newQuestionsListMiss)
+            saveData(Wronglist,"wrong",newQuestionsListMiss)
 //            Log.d("wrong",Wronglist.toString())
 //            Log.d("miss",misslist.toString())
-
             if (mInterstitialAd != null) {
                 showads()
             }
@@ -302,17 +384,48 @@ class Quizing : AppCompatActivity() {
         }
 
     }
-    fun saveData(list: MutableList<modifiedquestions>, saveString: String) {
+    fun saveData(list: MutableList<modifiedquestions>, saveString: String,changesQuestionlist: MutableList<modifiedquestions>) {
+
         val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
-        // Convert ScienceData to JSON string
-        val jsonString = Gson().toJson(list)
+        // Retrieve existing data from SharedPreferences
+        val gson = Gson()
+        val existingJson = sharedPreferences.getString(saveString, "")
+        val existingListType = object : TypeToken<List<stored_modifiedquestions>>() {}.type
+        val existingList: MutableList<stored_modifiedquestions> =
+            gson.fromJson(existingJson, existingListType) ?: mutableListOf()
 
-        // Save JSON string to SharedPreferences
-        editor.putString(saveString, jsonString)
+        // Find the section in the existing list
+        val existingSectionIndex = existingList.indexOfFirst { it.title == category }
+
+        // Create new questions list
+        val newQuestionsList = mutableListOf<modifiedquestions>()
+        list.forEach {
+            newQuestionsList.add(it)
+        }
+
+
+        if (existingSectionIndex != -1) {
+//            Toast.makeText(this@Quizing,"hello",Toast.LENGTH_LONG).show()
+            // If section exists, append new questions
+            changesQuestionlist.removeIf { it.tries==0 }
+            val existingSection = changesQuestionlist
+
+            existingSection.addAll(newQuestionsList)
+            existingList[existingSectionIndex] = stored_modifiedquestions(category, existingSection)
+        } else {
+            // If section does not exist, create a new entry
+            existingList.add(stored_modifiedquestions(category, newQuestionsList))
+        }
+
+        // Save the updated list back to SharedPreferences
+        val updatedJson = gson.toJson(existingList)
+        editor.putString(saveString, updatedJson)
         editor.apply()
     }
+
+
 
     private fun showads() {
         mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback(){
@@ -324,6 +437,7 @@ class Quizing : AppCompatActivity() {
                 super.onAdDismissedFullScreenContent()
                 val intent = Intent(this@Quizing,Result::class.java)
                 intent.putExtra("score",score.toString())
+                intent.putExtra("Quescount",questionList.size.toString())
                 startActivity(intent)
                 finish()
             }

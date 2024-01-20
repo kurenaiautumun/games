@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Fragments.missesFragment">
+    tools:context=".Fragments.missesFragment"
+    android:background="@color/background_disp">
 
     <TextView
         android:id="@+id/scienceMisses"
@@ -16,15 +17,28 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="5dp"/>
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/sciencecardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/scienceMisses"
+        app:cardCornerRadius="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="5dp"
+        >
     <ImageView
         android:id="@+id/scienceImageMisses"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scienceMisses" />
+        android:src="@drawable/sciencelogo"
+        android:scaleType="centerCrop"
+        />
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/moviesMisses"
@@ -34,8 +48,17 @@
         android:textStyle="bold"
         android:textSize="35sp"
         android:textColor="@color/textcolor"
-        app:layout_constraintTop_toBottomOf="@id/scienceImageMisses"
+        app:layout_constraintTop_toBottomOf="@id/sciencecardview"
         />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/moviecardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/moviesMisses"
+        app:cardCornerRadius="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="5dp"
+        >
 
     <ImageView
         android:id="@+id/moviesImageMisses"
@@ -43,7 +66,11 @@
         android:layout_height="200dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/moviesMisses" />
+        app:layout_constraintTop_toBottomOf="@id/moviesMisses"
+        android:src="@drawable/movies"
+        android:scaleType="centerCrop"/>
+    </androidx.cardview.widget.CardView>
+
 
     <TextView
         android:id="@+id/GKMisses"
@@ -53,14 +80,26 @@
         android:textStyle="bold"
         android:textSize="35sp"
         android:textColor="@color/textcolor"
-        app:layout_constraintTop_toBottomOf="@id/moviesImageMisses"
+        app:layout_constraintTop_toBottomOf="@id/moviecardview"
         />
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/gkcardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/GKMisses"
+        app:cardCornerRadius="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="5dp"
+        >
     <ImageView
         android:id="@+id/GKImageMisses"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="180dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/GKMisses" />
+        app:layout_constraintTop_toBottomOf="@id/GKMisses"
+        android:src="@drawable/gklogo"
+        android:scaleType="centerCrop"/>
+    </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
